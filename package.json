@@ -1,0 +1,8 @@
+{
+  "name": "techmap",
+  "version": "1.0.0",
+  "workspaces": ["backend"],
+  "scripts": {
+    "start": "node backend/server.js"
+  }
+}
