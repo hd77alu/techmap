@@ -50,8 +50,7 @@ Techmap is a responsive web application designed to empower Software Engineering
 2. **Initialize and seed the database**
 
    ```bash
-   cd backend/models
-   sqlite3 ../techmap.db < init.sql
+   node models/initDb.js 
    ```
 
 3. **Configure environment variables**
@@ -66,7 +65,6 @@ Techmap is a responsive web application designed to empower Software Engineering
 4. **Install backend dependencies**
 
    ```bash
-   cd backend
    npm install
    ```
 
@@ -134,4 +132,4 @@ See `backend/models/init.sql` for full details. Key tables:
 
 ---
 
-*Crafted with ❤ by Team 8 – Techmap*
+*Crafted with ❤ by The Blueprint Team.*
