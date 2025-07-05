@@ -43,6 +43,9 @@
 
 ---
 
+8. **login using Google to see the sample data**
+
+
 ## 📡 API Endpoints
 
 | Route                          | Method | Description                                     |
@@ -57,11 +60,6 @@
 | `/api/trends`                  | GET    | Get trending languages, frameworks, and roles   |
 | `/api/resume`                  | POST   | Analyze resume text and suggest skills/projects |
 
----
-3. **Navigate to the frontend directory:**
-   ```bash
-   cd frontend
-   ```
 ---
 
 ## 2. Git Workflow & Best Practices
