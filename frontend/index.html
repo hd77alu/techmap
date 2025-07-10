@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Techmap</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer src="index.js"></script>
 </head>
 <body>
@@ -29,15 +30,18 @@
 </div>
 <section>
     <h2 id="nav-profile">Profile</h2>
-    <pre id="profile"></pre>
-</section>
-<section>
-    <h2 id="nav-style">Learning Style</h2>
+    <div id="profile"></div>
+    <h3 id="nav-style">Your Preferred Learning Style</h2>
     <button onclick="saveLearningStyle('Visual')">Visual</button>
     <button onclick="saveLearningStyle('Auditory')">Auditory</button>
     <button onclick="saveLearningStyle('Kinesthetic')">Kinesthetic</button>
     <button onclick="saveLearningStyle('Reading/Writing')">Reading/Writing</button>
-    <pre id="learningStyle"></pre>
+</section> 
+<section>
+    <h2 id="nav-trends">Software industry insights</h2>
+    <button onclick="fetchTrends()">Show Trends</button>
+    <div id="trends" class="card-list"></div>
+    <canvas id="trendsChart" width="600" height="300"></canvas>
 </section>
 <section>
     <h2 id="nav-resources">Resources</h2>
@@ -45,17 +49,12 @@
     <button onclick="fetchResources('Auditory')">Auditory</button>
     <button onclick="fetchResources('Kinesthetic')">Kinesthetic</button>
     <button onclick="fetchResources('Reading/Writing')">Reading/Writing</button>
-    <pre id="resources"></pre>
+    <div id="resources" class="card-list"></div>
 </section>
 <section>
     <h2 id="nav-projects">Projects</h2>
     <button onclick="fetchProjects()">Show Projects</button>
-    <pre id="projects"></pre>
-</section>
-<section>
-    <h2 id="nav-trends">Trends</h2>
-    <button onclick="fetchTrends()">Show Trends</button>
-    <pre id="trends"></pre>
+    <div id="projects" class="card-list"></div>
 </section>
 <section>
     <h2 id="nav-resume">Resume Analysis</h2>
