@@ -14,7 +14,6 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
-
 app.use('/auth', require('./routes/authRoutes'));
 app.use('/api/resources', require('./routes/resourceRoutes'));
 app.use('/api/trends', require('./routes/trendsRoutes'));
