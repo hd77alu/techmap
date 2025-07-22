@@ -1,65 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Techmap</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script defer src="index.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Techmap</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="index.js"></script>
 </head>
 <body>
-<header class="header">
+  <header class="header">
     <div class="logo-container">
-        <img src="imgs/Vector - 0.svg" alt="Logo" class="logo" />
-        <h1>Techmap</h1>
+      <img src="imgs/Vector - 0.svg" alt="Logo" class="logo"/>
+      <h1>Techmap</h1>
     </div>
     <nav>
-        <ul>
-            <li><a href="#nav-style">Learning Styles</a></li>
-            <li><a href="#nav-resources">Resources</a></li>
-            <li><a href="#nav-projects">Projects</a></li>
-            <li><a href="#nav-trends">Trends</a></li>
-            <li><a href="#nav-resume">Resume Analysis</a></li>
-        </ul>
+      <ul>
+        <li><a href="#nav-style">Learning Styles</a></li>
+        <li><a href="#nav-resources">Resources</a></li>
+        <li><a href="#nav-projects">Projects</a></li>
+        <li><a href="#nav-trends">Trends</a></li>
+        <li><a href="#nav-resume">Resume Analysis</a></li>
+      </ul>
     </nav>
-</header>
-<div class="login-container">
+  </header>
+
+  <div class="login-container">
     <button id="loginBtn">Login with Google</button>
     <button id="logoutBtn">Logout</button>
-</div>
-<section>
-    <h2 id="nav-profile">Profile</h2>
-    <div id="profile"></div>
-    <h3 id="nav-style">Your Preferred Learning Style</h2>
-    <button onclick="saveLearningStyle('Visual')">Visual</button>
-    <button onclick="saveLearningStyle('Auditory')">Auditory</button>
-    <button onclick="saveLearningStyle('Kinesthetic')">Kinesthetic</button>
-    <button onclick="saveLearningStyle('Reading/Writing')">Reading/Writing</button>
-</section> 
-<section>
-    <h2 id="nav-trends">Software industry insights</h2>
-    <button onclick="fetchTrends()">Show Trends</button>
-    <div id="trends" class="card-list"></div>
+  </div>
+
+  <section class="welcome-section">
+    <div id="profile" class="welcome-box">Welcome, Jane!</div>
+    <p class="intro-text">
+      Techmap is designed to help bridge the gap between academic learning and industry demand,
+      empowering Software Engineering students for success in the professional world.
+    </p>
+  </section>
+
+  <section id="nav-style">
+    <h2>Your Preferred Learning Style</h2>
+    <div class="btn-group">
+      <button onclick="saveLearningStyle('Visual')" class="btn visual">Visual</button>
+      <button onclick="saveLearningStyle('Auditory')" class="btn auditory">Auditory</button>
+      <button onclick="saveLearningStyle('Kinesthetic')" class="btn kinesthetic">Kinesthetic</button>
+      <button onclick="saveLearningStyle('Reading/Writing')" class="btn reading">Reading/Writing</button>
+    </div>
+  </section>
+
+  <section id="nav-trends">
+    <h2>Software Industry insights</h2>
+    <button onclick="fetchTrends()" class="btn visual">Show Trends</button>
     <canvas id="trendsChart" width="600" height="300"></canvas>
-</section>
-<section>
-    <h2 id="nav-resources">Resources</h2>
-    <button onclick="fetchResources('Visual')">Visual</button>
-    <button onclick="fetchResources('Auditory')">Auditory</button>
-    <button onclick="fetchResources('Kinesthetic')">Kinesthetic</button>
-    <button onclick="fetchResources('Reading/Writing')">Reading/Writing</button>
+  </section>
+
+  <section id="nav-resources">
+    <h2>Resources</h2>
+    <div class="btn-group">
+      <button onclick="fetchResources('Visual!')" class="btn visual">Visual</button>
+      <button onclick="fetchResources('Auditory')" class="btn auditory">Auditory</button>
+      <button onclick="fetchResources('Kinesthetic')" class="btn kinesthetic">Kinesthetic</button>
+      <button onclick="fetchResources('Reading/Writing')" class="btn reading">Reading/Writing</button>
+    </div>
     <div id="resources" class="card-list"></div>
-</section>
-<section>
-    <h2 id="nav-projects">Projects</h2>
-    <button onclick="fetchProjects()">Show Projects</button>
+  </section>
+
+  <section id="nav-projects">
+    <h2>Projects</h2>
+    <button onclick="fetchProjects()" class="btn visual">Show Projects</button>
     <div id="projects" class="card-list"></div>
-</section>
-<section>
-    <h2 id="nav-resume">Resume Analysis</h2>
-    <label for="resumeText"></label><textarea id="resumeText" rows="4" cols="50" placeholder="Paste your resume here"></textarea><br>
-    <button onclick="analyzeResume()">Analyze Resume</button>
-</section>
+  </section>
+
+  <section id="nav-resume">
+    <h2>Resume Analysis</h2>
+    <textarea id="resumeText" placeholder="Paste your resume here..."></textarea>
+    <button onclick="analyzeResume()" class="btn kinesthetic">Analyze Resume</button>
+    <pre id="resumeResult"></pre>
+  </section>
 </body>
 </html>
