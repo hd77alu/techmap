@@ -7,6 +7,14 @@
   <link rel="stylesheet" href="styles.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="index.js"></script>
+  <!-- 🔁 Redirect to welcome.html if needed -->
+  <script>
+    // Optional: Add a simple condition so users don't get redirected repeatedly
+    if (!sessionStorage.getItem('visited')) {
+      sessionStorage.setItem('visited', 'true');
+      window.location.href = "welcome.html";
+    }
+  </script>
 </head>
 <body>
   <header class="header">

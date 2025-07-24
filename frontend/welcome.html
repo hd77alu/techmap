@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Welcome to Techmap</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom scrollbar for better dark UI consistency */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #14294d;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: #3b82f6;
+      border-radius: 4px;
+    }
+    .input-group {
+      position: relative;
+    }
+    .input-icon {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #94a3b8;
+      user-select: none;
+      transition: color 0.3s ease;
+    }
+    .input-icon:hover {
+      color: #60a5fa;
+    }
+    /* Custom blue used in the design */
+    :root {
+      --dark-blue: #14294d;
+      --primary-blue: #1e3a8a;
+    }
+    .btn-social {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 9999px;
+      transition: background-color 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      box-shadow: 0 0 6px rgba(0,0,0,0.12);
+    }
+    .btn-social:hover {
+      background-color: #1d4ed8;
+    }
+    .btn-social.google:hover {
+      background-color: #db4437;
+    }
+    .btn-social.github:hover {
+      background-color: #333;
+    }
+    /* Hide default input number spinner for password show/hide toggle compatibility */
+    input[type="password"], input[type="text"], input[type="email"] {
+      -moz-appearance: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-tr from-blue-950 via-blue-900 to-blue-900 min-h-screen flex items-center justify-center px-4">
+
+  <div class="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl shadow-2xl max-w-5xl w-full flex flex-col md:flex-row overflow-hidden">
+    <!-- Left side with image and quote -->
+    <section class="md:w-1/2 relative bg-cover bg-center" style="background-image: url('imgs/k.jpg')">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/70 flex flex-col justify-center items-center text-center p-6 md:p-10 rounded-l-2xl">
+        <p class="text-white text-xl md:text-2xl font-semibold leading-relaxed drop-shadow-lg">KNOWLEDGE IS THE ONLY THING<br/>YOU BUY THAT MAKES YOU RICHER</p>
+        <div class="mt-auto mb-6 flex space-x-4 justify-center">
+          <a href="#" aria-label="Facebook social link" class="text-white hover:text-blue-400 transition"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11 9.87v-7H8v-3h3v-2c0-3 2-4 4-4 1 0 2 0 2 .1v2h-1.2c-1 0-1.3.5-1.3 1.2v1.7h2.4l-.4 3h-2v7A10 10 0 0 0 22 12z"/></svg></a>
+          <a href="#" aria-label="Twitter social link" class="text-white hover:text-blue-400 transition"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M23 3a10.9 10.9 0 0 1-3 1 4.48 4.48 0 0 0-7 4v1H7a7 7 0 0 0 0 14h9a7 7 0 0 0 7-7c0-.2 0-.4-.1-.6A4.72 4.72 0 0 0 23 3z"/></svg></a>
+          <a href="#" aria-label="Instagram social link" class="text-white hover:text-blue-400 transition"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2C4.8 2 3 3.8 3 6v12c0 2.2 1.8 4 4 4h10c2.2 0 4-1.8 4-4V6c0-2.2-1.8-4-4-4H7zm10 2c.6 0 1 .4 1 1v1c0 .6-.4 1-1 1h-1c-.6 0-1-.4-1-1V5c0-.6.4-1 1-1h1zM12 7a5 5 0 1 1 0 10a5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6a3 3 0 0 0 0-6z"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right side with login/signup -->
+    <section class="md:w-1/2 bg-[var(--dark-blue)] rounded-r-2xl p-10 flex flex-col justify-center text-white">
+      <h1 class="text-3xl font-bold mb-8 border-l-4 border-white pl-4 max-w-max tracking-wide">Techmap</h1>
+      
+      <!-- Social login -->
+      <div class="flex space-x-6 mb-6 justify-center md:justify-start">
+        <button aria-label="Login with Facebook" title="Login with Facebook" class="btn-social bg-blue-700 hover:bg-blue-800">
+          <svg fill="currentColor" aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.58 0 0 .576 0 1.288v21.424C0 23.424.58 24 1.325 24h11.495v-9.294H9.691v-3.622h3.13V8.413c0-3.11 1.894-4.8 4.66-4.8 1.325 0 2.465.101 2.795.146v3.24l-1.918.001c-1.504 0-1.794.72-1.794 1.772v2.32h3.59l-.467 3.622h-3.123V24h6.116c.744 0 1.314-.576 1.314-1.288V1.288c0-.712-.57-1.288-1.314-1.288z"/></svg>
+        </button>
+        <button aria-label="Login with Google" title="Login with Google" class="btn-social google bg-red-600 hover:bg-red-700">
+          <svg fill="currentColor" aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24"><path d="M21.805 10.023H12v3.955h5.02c-.22 1.172-1.554 3.446-5.02 3.446-3.02 0-5.488-2.496-5.488-5.577s2.47-5.58 5.488-5.58c1.722 0 2.88.736 3.553 1.365l2.42-2.334C17.38 5.51 15.123 4.5 12 4.5 6.646 4.5 2.5 8.83 2.5 14.15s4.145 9.65 9.5 9.65c5.477 0 9.12-3.82 9.12-9.15 0-.62-.07-1.1-.315-1.627z"/></svg>
+        </button>
+        <button aria-label="Login with GitHub" title="Login with GitHub" class="btn-social github bg-gray-700 hover:bg-gray-800">
+          <svg fill="currentColor" aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24"><path d="M12 .297a12 12 0 0 0-3.793 23.398c.6.11.82-.25.82-.56v-2.234c-3.338.726-4.03-1.415-4.03-1.415-.546-1.383-1.334-1.75-1.334-1.75-1.09-.75.08-.735.08-.735 1.205.085 1.84 1.24 1.84 1.24 1.073 1.832 2.817 1.3 3.504.994.11-.778.42-1.3.767-1.6-2.665-.3-5.466-1.328-5.466-5.93 0-1.3.465-2.37 1.235-3.205-.135-.304-.54-1.527.12-3.176 0 0 1.005-.318 3.3 1.23a11.52 11.52 0 0 1 6 0c2.28-1.548 3.285-1.23 3.285-1.23.66 1.65.255 2.873.12 3.176.765.833 1.23 1.904 1.23 3.205 0 4.61-2.805 5.625-5.475 5.92.435.375.825 1.11.825 2.235v3.317c0 .31.22.68.825.565A12 12 0 0 0 12 .297"/></svg>
+        </button>
+      </div>
+      <p class="text-center text-sm text-gray-300 mb-6">or use your email account</p>
+
+      <!-- Form -->
+      <form id="authForm" class="space-y-6" novalidate>
+        <div>
+          <label for="email" class="block text-sm font-medium mb-1">Email</label>
+          <div class="input-group">
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              placeholder="you@example.com"
+              required 
+              class="w-full bg-transparent border-b border-gray-400 py-2 pr-10 placeholder:text-gray-400 focus:outline-none focus:border-blue-400" />
+            <span class="input-icon" aria-hidden="true">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12.713l11.985-7.5a2 2 0 0 0-2-3.213l-11.985 7.5-11.99-7.5A2 2 0 0 0 0 5.213l11.985 7.5zM2 7.98v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-10l-10 6.24L2 7.981z"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+        <div>
+          <label for="password" class="block text-sm font-medium mb-1">Password</label>
+          <div class="input-group">
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              placeholder="Enter password"
+              required 
+              class="w-full bg-transparent border-b border-gray-400 py-2 pr-10 placeholder:text-gray-400 focus:outline-none focus:border-blue-400" 
+              autocomplete="current-password" />
+            <span class="input-icon" id="togglePassword" role="button" aria-label="Toggle password visibility" tabindex="0">
+              <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>  
+            </span>
+          </div>
+        </div>
+        <div class="text-right">
+          <a href="#" class="text-sm text-blue-400 hover:underline">Forgot Your Password ?</a>
+        </div>
+
+        <button type="submit" class="w-full bg-white text-[var(--dark-blue)] py-3 rounded-full font-semibold tracking-wide hover:bg-gray-100 transition">ENTER</button>
+      </form>
+
+      <p class="mt-6 text-sm text-gray-300 text-center">
+        Don't have an account? 
+        <button id="toggleFormBtn" class="text-blue-400 font-semibold hover:underline focus:outline-none" aria-live="polite">Sign up</button>
+      </p>
+    </section>
+  </div>
+
+<script>
+  // Toggle password show/hide
+  const passwordInput = document.getElementById('password');
+  const togglePassword = document.getElementById('togglePassword');
+  const eyeIcon = document.getElementById('eyeIcon');
+  togglePassword.addEventListener('click', () => {
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    // Swap icon
+    if(type === 'password') {
+      eyeIcon.setAttribute('fill', 'none');
+      eyeIcon.setAttribute('stroke', 'currentColor');
+      eyeIcon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+    } else {
+      eyeIcon.innerHTML = `<path d="M17.94 17.94a10.463 10.463 0 0 1-11.88-11.88m14.12 14.12L1 1"/>`;
+    }
+  });
+
+  // Toggle between Login and Signup form
+  const toggleFormBtn = document.getElementById('toggleFormBtn');
+  const authForm = document.getElementById('authForm');
+  let isLogin = true;
+
+  toggleFormBtn.addEventListener('click', () => {
+    if(isLogin) {
+      // Switch to Signup
+      authForm.email.placeholder = "you@example.com";
+      authForm.password.placeholder = "Create a password";
+      toggleFormBtn.textContent = "Login";
+      authForm.querySelector('button[type="submit"]').textContent = "SIGN UP";
+      isLogin = false;
+    } else {
+      // Switch to Login
+      authForm.email.placeholder = "you@example.com";
+      authForm.password.placeholder = "Enter password";
+      toggleFormBtn.textContent = "Sign up";
+      authForm.querySelector('button[type="submit"]').textContent = "ENTER";
+      isLogin = true;
+    }
+  });
+
+  // Form submission handling - just prevent default for demo
+  authForm.addEventListener('submit', e => {
+    e.preventDefault();
+    alert(isLogin ? 'Logging in...' : 'Signing up...');
+  });
+</script>
+
+</body>
+</html>
+
