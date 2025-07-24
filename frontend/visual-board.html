@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tech Vision Board</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .image-placeholder {
+      border: 2px dashed #a78bfa;
+      border-radius: 0.5rem;
+      background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8b5cf6;
+      font-size: 0.875rem;
+      text-align: center;
+      height: 160px;
+      position: relative;
+    }
+    .image-placeholder svg {
+      stroke: #8b5cf6;
+      stroke-width: 2;
+      width: 36px;
+      height: 36px;
+      margin-bottom: 0.25rem;
+    }
+    .caption-input {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 0.375rem;
+      padding: 0.25rem 0.5rem;
+      margin-top: 0.25rem;
+      font-size: 0.875rem;
+      resize: vertical;
+    }
+    .image-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    /* Smooth scroll for multiple boards container */
+    #boardsContainer {
+      max-height: 70vh;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-tr from-indigo-600 to-blue-400 min-h-screen text-gray-800 flex flex-col items-center py-8 px-4">
+  <header class="mb-8 text-center max-w-4xl w-full">
+    <h1 class="text-4xl font-extrabold text-white mb-1 select-none">
+      <span aria-hidden="true">✨</span>
+      Tech Vision Board
+      <span aria-hidden="true">✨</span>
+    </h1>
+    <p class="text-indigo-200 max-w-md mx-auto select-none">Visualize your tech dreams and make them reality</p>
+  </header>
+
+  <main class="bg-white bg-opacity-90 rounded-lg shadow-lg max-w-4xl w-full p-6 space-y-6">
+    <!-- Boards container for multiple boards -->
+    <div id="boardsContainer" class="space-y-10">
+      <!-- Boards will be injected here -->
+    </div>
+
+    <div class="flex justify-end">
+      <button id="newBoardBtn" 
+              class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2 rounded-lg shadow-md transition flex items-center gap-2"
+              aria-label="Create a new vision board">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        New Board
+      </button>
+    </div>
+  </main>
+
+  <!-- Template for each board -->
+  <template id="boardTemplate">
+    <section class="board rounded-md border border-indigo-400 p-5 bg-gradient-to-tr from-indigo-50 to-white shadow-lg">
+      <header>
+        <h2 class="text-indigo-700 font-semibold mb-2 flex items-center gap-2 select-none">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#6d28d9" stroke-width="2" viewBox="0 0 24 24" class="w-6 h-6">
+            <circle cx="12" cy="12" r="10" stroke-linecap="round" stroke-linejoin="round"></circle>
+            <circle cx="12" cy="12" r="4" stroke-linecap="round" stroke-linejoin="round"></circle>
+          </svg>
+          <span class="board-title">My Tech Goal</span>
+        </h2>
+        <!-- Goal display / set container -->
+        <div class="goal-display mb-4">
+          <div tabindex="0" class="goal-text cursor-pointer border-2 border-indigo-300 rounded-md px-3 py-2 text-indigo-600 italic bg-indigo-50"
+               aria-label="Click to set your inspiring tech goal" role="button" aria-expanded="false">
+            Click to set your inspiring tech goal...
+          </div>
+        </div>
+        <!-- Goal form - hidden initially -->
+        <form class="goal-form space-y-3 hidden" novalidate>
+          <label for="goalInput" class="block text-indigo-700 font-semibold">Your Tech Goal</label>
+          <textarea id="goalInput" rows="3" placeholder="What's your inspiring tech goal? Be specific and ambitious!" class="w-full border border-indigo-300 rounded-md p-2 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400"></textarea>
+          <label for="deadlineInput" class="block text-indigo-700 font-semibold">Target Deadline</label>
+          <input id="deadlineInput" type="date" class="w-full border border-indigo-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          <div class="flex gap-4 justify-end">
+            <button type="submit" class="bg-indigo-600 text-white rounded-md px-4 py-2 font-semibold hover:bg-indigo-700 transition" aria-label="Save Goal">Save Goal</button>
+            <button type="button" class="cancel-goal-btn bg-gray-300 text-gray-700 rounded-md px-4 py-2 font-semibold hover:bg-gray-400 transition" aria-label="Cancel Goal">Cancel</button>
+          </div>
+        </form>
+      </header>
+
+      <section class="vision-board mt-4">
+        <div class="text-indigo-700 font-semibold mb-2 select-none vision-count">
+          Vision Board (0/5)
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 vision-images">
+          <!-- Each image placeholder or image with caption goes here -->
+          <!-- Max 5 slots -->
+        </div>
+        <div class="flex justify-center mt-4">
+          <label for="uploadImage" class="upload-btn cursor-pointer select-none bg-gradient-to-r from-indigo-600 to-cyan-400 text-white py-2 px-5 rounded-lg shadow-md hover:from-indigo-700 hover:to-cyan-500 transition inline-flex items-center gap-2" aria-label="Upload Inspiration Image">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12v8m0-14v4m0 0l3-3m-3 3L9 7"/>
+            </svg>
+            Upload Inspiration Image
+            <input type="file" id="uploadImage" accept="image/png, image/jpeg, image/gif" class="hidden" />
+          </label>
+        </div>
+        <div class="text-xs text-center text-gray-500 mt-1 select-none">
+          JPG, PNG, GIF up to 10MB
+        </div>
+      </section>
+
+      <footer class="mt-6 flex justify-between items-center">
+        <button class="save-board-btn bg-green-600 text-white px-5 py-2 rounded-lg font-semibold shadow hover:bg-green-700 transition" aria-label="Save Vision Board" disabled>Save Visual Board</button>
+        <div class="saved-message text-green-700 font-semibold hidden select-none" aria-live="polite" role="status">Visual Board saved!</div>
+      </footer>
+    </section>
+  </template>
+
+  <!-- Template for image placeholder slot -->
+  <template id="imageSlotTemplate">
+    <div class="image-wrapper" role="group" aria-label="Inspiration image slot">
+      <div tabindex="0" class="image-placeholder" role="button" aria-label="Add an inspiration image">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#8b5cf6" stroke-width="2" viewBox="0 0 24 24" class="mx-auto mb-1 w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          Add another inspiration
+        </div>
+      </div>
+      <input type="text" class="caption-input" maxlength="80" placeholder="Add caption below image..." aria-label="Image caption input" />
+    </div>
+  </template>
+
+
+<script>
+  (() => {
+    let boardCounter = 0;
+    const maxImagesPerBoard = 5;
+    const boardsContainer = document.getElementById('boardsContainer');
+    const newBoardBtn = document.getElementById('newBoardBtn');
+    const boardTemplate = document.getElementById('boardTemplate');
+    const imageSlotTemplate = document.getElementById('imageSlotTemplate');
+
+    // For storing boards in memory (could be extended to localStorage)
+    const boardsState = [];
+
+    // Helpers
+    function createImageSlot() {
+      const slot = imageSlotTemplate.content.cloneNode(true);
+      const placeholder = slot.querySelector('.image-placeholder');
+      const captionInput = slot.querySelector('.caption-input');
+
+      // We want the placeholder click to trigger file upload for this slot
+      placeholder.addEventListener('click', () => {
+        // Create temporary invisible file input to upload image for this slot only
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/png, image/jpeg, image/gif';
+        input.onchange = (e) => {
+          const file = e.target.files[0];
+          if (file && file.size <= 10 * 1024 * 1024) {
+            readAndSetImage(file, placeholder);
+          } else if(file) {
+            alert('The selected file is too large. Maximum size is 10MB.');
+          }
+        };
+        input.click();
+      });
+
+      return slot;
+    }
+
+    function readAndSetImage(file, placeholderElement) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        // Replace placeholder content with image and caption below
+        const imgSrc = e.target.result;
+        const container = placeholderElement.parentElement;
+
+        // Create img element
+        const img = document.createElement('img');
+        img.src = imgSrc;
+        img.alt = 'User added tech inspiration image';
+        img.className = 'rounded-md object-cover w-full h-40 shadow-md cursor-pointer';
+        img.onerror = () => {
+          img.src = 'https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/117625ad-981b-450a-928c-9fccb5aa3e3c.png';
+        };
+
+        // Replace placeholder with image
+        placeholderElement.replaceWith(img);
+
+        // Focus caption input automatically
+        const captionInput = container.querySelector('.caption-input');
+        captionInput.focus();
+
+        // Trigger vision count update
+        updateVisionCount(container.closest('section.board'));
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updateVisionCount(boardElement) {
+      const visionCountText = boardElement.querySelector('.vision-count');
+      const imagesContainer = boardElement.querySelector('.vision-images');
+      const imagesWithSrc = Array.from(imagesContainer.querySelectorAll('img')).length;
+      visionCountText.textContent = `Vision Board (${imagesWithSrc}/${maxImagesPerBoard})`;
+
+      // Disable upload if max reached
+      const uploadInput = boardElement.querySelector('#uploadImage') || boardElement.querySelector('input[type="file"]');
+      if (imagesWithSrc >= maxImagesPerBoard) {
+        if (uploadInput) uploadInput.disabled = true;
+      } else {
+        if (uploadInput) uploadInput.disabled = false;
+      }
+
+      // Enable Save Visual Board only if goal text is set and at least 1 image added
+      const saveBtn = boardElement.querySelector('.save-board-btn');
+      const goalText = boardElement.getAttribute('data-goal') || '';
+      saveBtn.disabled = !(goalText.trim().length > 0 && imagesWithSrc > 0);
+    }
+
+    // Upload image for board - common handler
+    function handleUploadImage(boardElement, file) {
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) {
+        alert('The selected file is too large. Maximum size is 10MB.');
+        return;
+      }
+      const imagesContainer = boardElement.querySelector('.vision-images');
+      const currentImagesCount = imagesContainer.querySelectorAll('img').length;
+      if (currentImagesCount >= maxImagesPerBoard) {
+        alert(`You can add up to ${maxImagesPerBoard} images only.`);
+        return;
+      }
+
+      // Find first placeholder slot that is still a placeholder
+      const placeholders = imagesContainer.querySelectorAll('.image-placeholder');
+      if (placeholders.length === 0) {
+        alert('No empty image slots available.');
+        return;
+      }
+      readAndSetImage(file, placeholders[0]);
+    }
+
+    // Create board UI, insert placeholders and wire interactions
+    function createNewBoard() {
+      const clone = boardTemplate.content.cloneNode(true);
+      const boardElement = clone.querySelector('section.board');
+      const visionImagesDiv = boardElement.querySelector('.vision-images');
+      const captionInputs = [];
+
+      boardCounter++;
+      boardElement.setAttribute('data-board-id', boardCounter);
+      boardElement.setAttribute('data-goal', '');
+
+      // Set dynamic title
+      const titleElem = boardElement.querySelector('.board-title');
+      titleElem.textContent = `My Tech Goal #${boardCounter}`;
+
+      // Clear/Add placeholders (max 5)
+      for (let i = 0; i < maxImagesPerBoard; i++) {
+        const slot = createImageSlot();
+        visionImagesDiv.appendChild(slot);
+      }
+
+      // Elements refs
+      const goalDisplayDiv = boardElement.querySelector('.goal-display');
+      const goalTextDiv = boardElement.querySelector('.goal-text');
+      const goalForm = boardElement.querySelector('.goal-form');
+      const goalTextarea = goalForm.querySelector('#goalInput');
+      const deadlineInput = goalForm.querySelector('#deadlineInput');
+      const cancelGoalBtn = goalForm.querySelector('.cancel-goal-btn');
+      const saveBoardBtn = boardElement.querySelector('.save-board-btn');
+      const savedMsg = boardElement.querySelector('.saved-message');
+      const uploadInput = boardElement.querySelector('#uploadImage');
+
+      // Click goal text to show form
+      goalTextDiv.addEventListener('click', () => {
+        goalForm.classList.remove('hidden');
+        goalDisplayDiv.classList.add('hidden');
+        goalTextarea.focus();
+        goalTextDiv.setAttribute('aria-expanded', 'true');
+      });
+      goalTextDiv.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          goalTextDiv.click();
+        }
+      });
+
+      // Cancel button hides form, restore old text
+      cancelGoalBtn.addEventListener('click', () => {
+        goalForm.classList.add('hidden');
+        goalDisplayDiv.classList.remove('hidden');
+        goalTextDiv.setAttribute('aria-expanded', 'false');
+      });
+
+      // Goal form submit handler
+      goalForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const goalVal = goalTextarea.value.trim();
+        const deadlineVal = deadlineInput.value;
+
+        if (!goalVal) {
+          alert('Please enter your tech goal.');
+          goalTextarea.focus();
+          return;
+        }
+        // Optional: deadline validation could be added here
+
+        // Update display text
+        goalTextDiv.textContent = goalVal + (deadlineVal ? ` (Deadline: ${deadlineVal})` : '');
+        boardElement.setAttribute('data-goal', goalVal);
+
+        // Hide form, show display
+        goalForm.classList.add('hidden');
+        goalDisplayDiv.classList.remove('hidden');
+        goalTextDiv.setAttribute('aria-expanded', 'false');
+
+        updateVisionCount(boardElement);
+      });
+
+      // Upload input change handler for this board
+      uploadInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+          handleUploadImage(boardElement, e.target.files[0]);
+          e.target.value = '';
+        }
+      });
+
+      // Save Visual Board button handler
+      saveBoardBtn.addEventListener('click', () => {
+        // Gather all info of this board and show download option
+        const goalText = boardElement.getAttribute('data-goal');
+        if (!goalText) {
+          alert('Please set your tech goal before saving.');
+          return;
+        }
+        const imagesContainer = boardElement.querySelector('.vision-images');
+        const images = Array.from(imagesContainer.querySelectorAll('img'));
+        if (images.length === 0) {
+          alert('Please add at least one image before saving.');
+          return;
+        }
+        const captions = Array.from(imagesContainer.querySelectorAll('.caption-input'));
+        saveVisualBoardAsJSON(goalText, captions, images, boardCounter);
+
+        // Show saved message
+        savedMsg.classList.remove('hidden');
+        setTimeout(() => savedMsg.classList.add('hidden'), 3000);
+      });
+
+      // Insert the new board at the end
+      boardsContainer.appendChild(boardElement);
+    }
+
+    // Save visual board as JSON file for download
+    function saveVisualBoardAsJSON(goalText, captions, images, boardNumber) {
+      const data = {
+        goal: goalText,
+        inspirations: [],
+      };
+      images.forEach((img, i) => {
+        const caption = captions[i]?.value || '';
+        data.inspirations.push({
+          caption,
+          imageDataUrl: img.src,
+        });
+      });
+      const jsonStr = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `tech-vision-board-${boardNumber}.json`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      URL.revokeObjectURL(url);
+    }
+
+    // Initialization:
+    // Start with one board by default
+    createNewBoard();
+
+    // Wire new board button
+    newBoardBtn.addEventListener('click', () => {
+      createNewBoard();
+      // Scroll to bottom smoothly so user sees new board
+      boardsContainer.scrollTo({ top: boardsContainer.scrollHeight, behavior: 'smooth' });
+    });
+
+  })();
+</script>
+</body>
+</html>
+

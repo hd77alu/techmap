@@ -53,6 +53,7 @@ document.getElementById('quizForm').onsubmit = async function(e) {
     const data = await res.json();
     console.log('Success response:', data); // Debug log
     document.getElementById('quizResult').textContent = "VARK Assessment saved! Redirecting...";
+
     setTimeout(() => window.location = 'index.html', 1500);
   } catch (error) {
     console.error('Error saving assessment:', error);
