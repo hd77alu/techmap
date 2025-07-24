@@ -26,8 +26,8 @@
   </header>
 
   <div class="login-container">
-    <button id="loginBtn">Login with Google</button>
-    <button id="logoutBtn">Logout</button>
+    <button class="log-btn" id="loginBtn">Login with Google</button>
+    <button class="log-btn" id="logoutBtn">Logout</button>
   </div>
 
   <section class="welcome-section">
@@ -36,15 +36,25 @@
       Techmap is designed to help bridge the gap between academic learning and industry demand,
       empowering Software Engineering students for success in the professional world.
     </p>
+<a href="quiz.html" class="quiz-btn">Take Learning Style Quiz</a>
   </section>
 
   <section id="nav-style">
-    <h2>Your Preferred Learning Style</h2>
-    <div class="btn-group">
-      <button onclick="saveLearningStyle('Visual')" class="btn visual">Visual</button>
-      <button onclick="saveLearningStyle('Auditory')" class="btn auditory">Auditory</button>
-      <button onclick="saveLearningStyle('Kinesthetic')" class="btn kinesthetic">Kinesthetic</button>
-      <button onclick="saveLearningStyle('Reading/Writing')" class="btn reading">Reading/Writing</button>
+    <h2>Your Learning Styles</h2>
+    <div id="styleResultsHeading" class="style-results-heading"></div>
+    <div id="styleResults" class="style-list"></div>
+    <div class="btn-group" id="styleBtnGroup"></div>
+    
+    <div id="learningDescription" class="learning-description">
+      <div class="description-content">
+        <p><strong>Visual Learners:</strong> Prefer to learn through visual aids such as diagrams, charts, maps, and videos. They benefit from seeing information presented in a visual format.</p>
+        
+        <p><strong>Auditory Learners:</strong> Learn best through listening and verbal instruction. They prefer spoken explanations, discussions, lectures, and audiobooks.</p>
+        
+        <p><strong>Kinesthetic/Tactile Learners:</strong> Learn by doing and engaging in hands-on activities. They prefer to physically manipulate objects, participate in experiments, and engage in role-playing exercises.</p>
+        
+        <p><strong>Read/Write Learners:</strong> Learn effectively through reading and writing activities. They prefer to read textbooks, take notes, and write summaries or essays to process information.</p>
+      </div>
     </div>
   </section>
 
@@ -56,12 +66,7 @@
 
   <section id="nav-resources">
     <h2>Resources</h2>
-    <div class="btn-group">
-      <button onclick="fetchResources('Visual!')" class="btn visual">Visual</button>
-      <button onclick="fetchResources('Auditory')" class="btn auditory">Auditory</button>
-      <button onclick="fetchResources('Kinesthetic')" class="btn kinesthetic">Kinesthetic</button>
-      <button onclick="fetchResources('Reading/Writing')" class="btn reading">Reading/Writing</button>
-    </div>
+    <div class="btn-group"></div>
     <div id="resources" class="card-list"></div>
   </section>
 

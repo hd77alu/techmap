@@ -19,8 +19,11 @@ db.serialize(() => {
     CREATE TABLE IF NOT EXISTS learning_styles (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
-      style_type TEXT,
-      assessment_date TEXT,
+      visual REAL NOT NULL DEFAULT 0,
+      auditory REAL NOT NULL DEFAULT 0,
+      kinesthetic REAL NOT NULL DEFAULT 0,
+      reading REAL NOT NULL DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(user_id) REFERENCES users(id)
     )
   `);
@@ -93,8 +96,8 @@ db.serialize(() => {
   `);
 
   db.run(`
-    INSERT INTO learning_styles (user_id, style_type, assessment_date)
-    VALUES (1, 'Visual', datetime('now'))
+    INSERT OR IGNORE INTO learning_styles (user_id, visual, auditory, kinesthetic, reading, created_at)
+    VALUES (1, 40, 30, 20, 10, datetime('now'))
   `);
 
   db.run(`
