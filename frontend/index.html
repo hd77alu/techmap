@@ -37,9 +37,7 @@
       empowering Software Engineering students for success in the professional world.
     </p>
 <a href="quiz.html" class="quiz-btn">Take Learning Style Quiz</a>
-<a href="#" id="visionBoardBtn" class="quiz-btn" style="margin-top: 1rem;">
-  Go to Tech Vision Board
-</a>
+<a href="#" id="visionBoardBtn" class="quiz-btn">Go to Tech Vision Board</a>
   </section>
 
   <section id="nav-style">
@@ -85,50 +83,5 @@
     <button onclick="analyzeResume()" class="btn kinesthetic">Analyze Resume</button>
     <pre id="resumeResult"></pre>
   </section>
-  <script>
-  // Dummy check for login state using localStorage
-  function isUserLoggedIn() {
-    return localStorage.getItem("userLoggedIn") === "true";
-  }
-
-  // Vision Board button logic
-  document.getElementById("visionBoardBtn").addEventListener("click", function (e) {
-    e.preventDefault();
-    if (!isUserLoggedIn()) {
-      alert("Please log in first to access your Tech Vision Board.");
-      // You could redirect to login or stay on this page
-    } else {
-      window.location.href = "visual-board.html";
-    }
-  });
-
-  // Optional: Show/hide login/logout buttons
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const profileBox = document.getElementById("profile");
-
-  loginBtn.addEventListener("click", () => {
-    // Simulate login
-    localStorage.setItem("userLoggedIn", "true");
-    profileBox.textContent = "Welcome, Jane!";
-    alert("You're now logged in!");
-  });
-
-  logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("userLoggedIn");
-    profileBox.textContent = "Welcome, Guest!";
-    alert("You've been logged out.");
-  });
-
-  // On page load, update greeting
-  window.addEventListener("DOMContentLoaded", () => {
-    if (isUserLoggedIn()) {
-      profileBox.textContent = "Welcome, Jane!";
-    } else {
-      profileBox.textContent = "Welcome, Guest!";
-    }
-  });
-</script>
-
 </body>
 </html>
