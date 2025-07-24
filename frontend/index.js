@@ -1,7 +1,14 @@
 // Helper to handle fetch with credentials
 function apiFetch(url, options = {}) {
     return fetch(url, { credentials: 'include', ...options })
-        .then(res => res.ok ? res.json() : Promise.reject(res));
+        .then(res => {
+            if (res.ok) return res.json();
+            if (res.status === 401) {
+                console.log('User not authenticated');
+                return Promise.reject({ status: 401, message: 'Not authenticated' });
+            }
+            return Promise.reject(res);
+        });
 }
 
 // Auth
@@ -26,18 +33,249 @@ function fetchProfile() {
 }
 fetchProfile();
 
+// Fetch and display user's learning style assessment in descending order
+function fetchLearningStyleAssessment() {
+    apiFetch('/api/learning-style')
+        .then(data => {
+            let styleScores;
+            if (data && (data.visual || data.auditory || data.kinesthetic || data.reading)) {
+                styleScores = [
+                    ['Visual', data.visual || 0],
+                    ['Auditory', data.auditory || 0],
+                    ['Kinesthetic', data.kinesthetic || 0],
+                    ['Reading/Writing', data.reading || 0]
+                ];
+                styleScores.sort((a, b) => b[1] - a[1]);
 
-// Learning Style
-function saveLearningStyle(style) {
-    apiFetch('/api/learning-style', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ style })
+            // Display heading and percentages in nav-style section
+            const styleResultsHeading = document.getElementById('styleResultsHeading');
+            if (styleResultsHeading) styleResultsHeading.textContent = 'Based On VARK Assessment Results:';
+            
+            // Clear the old style list display as we'll show it with buttons now
+            const styleResultsDiv = document.getElementById('styleResults');
+            if (styleResultsDiv) styleResultsDiv.innerHTML = '';
+
+            // Helper function to get CSS class name
+            const getStyleClass = (style) => {
+                const classMap = {
+                    'Visual': 'visual',
+                    'Auditory': 'auditory', 
+                    'Kinesthetic': 'kinesthetic',
+                    'Reading/Writing': 'reading'
+                };
+                return classMap[style] || style.toLowerCase();
+            };
+
+            // Dynamically render style buttons with percentages in sorted order
+            const styleBtnGroup = document.getElementById('styleBtnGroup');
+            if (styleBtnGroup) {
+                styleBtnGroup.innerHTML = styleScores.map(
+                    ([style, percent]) => {
+                        const styleClass = getStyleClass(style);
+                        return `
+                            <div class="style-button-container">
+                                <div class="style-percentage ${styleClass}">${percent}%</div>
+                                <div class="style-button-wrapper">
+                                    <button onclick="selectLearningStyle('${styleClass}')" class="btn ${styleClass}">${style}</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                ).join('');
+            }
+
+            // Dynamically render style buttons in sorted order (for resources)
+            const resBtnGroup = document.querySelector('#nav-resources .btn-group');
+            if (resBtnGroup) {
+                resBtnGroup.innerHTML = styleScores.map(
+                    ([style]) => `<button onclick="fetchResources('${style}')" class="btn ${getStyleClass(style)}">${style}</button>`
+                ).join('');
+            }
+
+            // Optionally, auto-fetch resources for top style
+            if (styleScores[0]) fetchResources(styleScores[0][0]);
+        } else {
+            // No quiz data, show default buttons (simple style without percentages)
+            const defaultStyles = [
+                ['Visual', 'visual'],
+                ['Auditory', 'auditory'],
+                ['Kinesthetic', 'kinesthetic'],
+                ['Reading/Writing', 'reading']
+            ];
+            const styleBtnGroup = document.getElementById('styleBtnGroup');
+            if (styleBtnGroup) {
+                styleBtnGroup.innerHTML = defaultStyles.map(
+                    ([label, styleClass]) => `<button onclick="selectLearningStyle('${styleClass}')" class="btn ${styleClass}">${label}</button>`
+                ).join('');
+            }
+            // Also set default resource buttons
+            const resBtnGroup = document.querySelector('#nav-resources .btn-group');
+            if (resBtnGroup) {
+                resBtnGroup.innerHTML = defaultStyles.map(
+                    ([label, styleClass]) => `<button onclick="fetchResources('${label}')" class="btn ${styleClass}">${label}</button>`
+                ).join('');
+            }
+            // Clear style results and heading
+            const styleResultsDiv = document.getElementById('styleResults');
+            if (styleResultsDiv) styleResultsDiv.innerHTML = '';
+            const styleResultsHeading = document.getElementById('styleResultsHeading');
+            if (styleResultsHeading) styleResultsHeading.textContent = '';
+        }
     })
-        .then(data => document.getElementById('learningStyle').textContent = JSON.stringify(data, null, 2))
-        .catch(err => document.getElementById('learningStyle').textContent = 'Error saving style');
+    .catch((error) => {
+            if (error.status === 401) {
+                console.log('User not authenticated - showing default buttons');
+                // User not authenticated, show default buttons without error
+                const defaultStyles = [
+                    ['Visual', 'visual'],
+                    ['Auditory', 'auditory'],
+                    ['Kinesthetic', 'kinesthetic'],
+                    ['Reading/Writing', 'reading']
+                ];
+                const styleBtnGroup = document.getElementById('styleBtnGroup');
+                if (styleBtnGroup) {
+                    styleBtnGroup.innerHTML = defaultStyles.map(
+                        ([label, styleClass]) => `<button onclick="selectLearningStyle('${styleClass}')" class="btn ${styleClass}">${label}</button>`
+                    ).join('');
+                }
+                const resBtnGroup = document.querySelector('#nav-resources .btn-group');
+                if (resBtnGroup) {
+                    resBtnGroup.innerHTML = defaultStyles.map(
+                        ([label, styleClass]) => `<button onclick="fetchResources('${label}')" class="btn ${styleClass}">${label}</button>`
+                    ).join('');
+                }
+                const styleResultsDiv = document.getElementById('styleResults');
+                if (styleResultsDiv) styleResultsDiv.innerHTML = '';
+                const styleResultsHeading = document.getElementById('styleResultsHeading');
+                if (styleResultsHeading) styleResultsHeading.textContent = '';
+                return;
+            }
+            // On other errors, show default buttons
+            const defaultStyles = [
+                ['Visual', 'visual'],
+                ['Auditory', 'auditory'],
+                ['Kinesthetic', 'kinesthetic'],
+                ['Reading/Writing', 'reading']
+            ];
+            const styleBtnGroup = document.getElementById('styleBtnGroup');
+            if (styleBtnGroup) {
+                styleBtnGroup.innerHTML = defaultStyles.map(
+                    ([label, style]) => `<button onclick="selectLearningStyle('${style}')" class="btn ${style}">${label}</button>`
+                ).join('');
+            }
+            const resBtnGroup = document.querySelector('#nav-resources .btn-group');
+            if (resBtnGroup) {
+                resBtnGroup.innerHTML = defaultStyles.map(
+                    ([label, style]) => `<button onclick=\"fetchResources('${label}')\" class=\"btn ${style}\">${label}</button>`
+                ).join('');
+            }
+            const styleResultsDiv = document.getElementById('styleResults');
+            if (styleResultsDiv) styleResultsDiv.innerHTML = '';
+            const styleResultsHeading = document.getElementById('styleResultsHeading');
+            if (styleResultsHeading) styleResultsHeading.textContent = '';
+        });
 }
-window.saveLearningStyle = saveLearningStyle;
+
+// Call this after login/profile loaded
+fetchLearningStyleAssessment();
+
+// Define learning style descriptions
+const learningStyleDescriptions = {
+    visual: {
+        title: "Visual Learner",
+        content: `
+            <p><strong>How you learn best:</strong> You prefer seeing information through charts, diagrams, mind maps, and visual presentations. You understand concepts better when they're displayed graphically.</p>
+            <p><strong>Study strategies:</strong> Use colorful notes, create flowcharts, watch educational videos, and organize information in visual formats like tables and graphs.</p>
+            <p><strong>Tech skills development:</strong> Focus on visual programming tools, UI/UX design, data visualization, and interactive tutorials with visual elements.</p>
+        `
+    },
+    auditory: {
+        title: "Auditory Learner", 
+        content: `
+            <p><strong>How you learn best:</strong> You absorb information through listening, discussions, and verbal explanations. You learn well through lectures, podcasts, and group conversations.</p>
+            <p><strong>Study strategies:</strong> Record yourself reading notes, join study groups, listen to educational podcasts, and explain concepts out loud to others.</p>
+            <p><strong>Tech skills development:</strong> Engage with coding bootcamp lectures, technical podcasts, pair programming sessions, and verbal code reviews.</p>
+        `
+    },
+    kinesthetic: {
+        title: "Kinesthetic/Tactile Learner",
+        content: `
+            <p><strong>How you learn best:</strong> You learn through hands-on activities, physical movement, and practical application. You prefer learning by doing rather than watching or listening.</p>
+            <p><strong>Study strategies:</strong> Use interactive simulations, build physical models, take frequent breaks for movement, and practice skills immediately.</p>
+            <p><strong>Tech skills development:</strong> Focus on hands-on coding projects, build real applications, use interactive coding platforms, and learn through experimentation.</p>
+        `
+    },
+    reading: {
+        title: "Read/Write Learner",
+        content: `
+            <p><strong>How you learn best:</strong> You prefer text-based learning through reading and writing. You excel with written instructions, note-taking, and text-heavy materials.</p>
+            <p><strong>Study strategies:</strong> Take detailed written notes, create lists and outlines, read comprehensive documentation, and write summaries of what you learn.</p>
+            <p><strong>Tech skills development:</strong> Study technical documentation thoroughly, maintain detailed coding notes, write technical blogs, and engage with text-based tutorials.</p>
+        `
+    }
+};
+
+// Function to select learning style and show dynamic description
+function selectLearningStyle(style) {
+    // Fetch resources for the selected style
+    const styleMapping = {
+        'visual': 'Visual',
+        'auditory': 'Auditory',
+        'kinesthetic': 'Kinesthetic',
+        'reading': 'Reading/Writing'
+    };
+    
+    fetchResources(styleMapping[style] || style);
+    
+    // Update dynamic description
+    updateLearningDescription(style);
+    
+    // Update button active states
+    updateButtonStates(style);
+}
+
+// Function to update learning description based on selected style
+function updateLearningDescription(selectedStyle) {
+    const descriptionContainer = document.getElementById('learningDescription');
+    if (!descriptionContainer) return;
+
+    const description = learningStyleDescriptions[selectedStyle];
+    if (!description) return;
+
+    // Remove all style classes
+    descriptionContainer.className = 'learning-description';
+    
+    // Add the selected style class
+    descriptionContainer.classList.add(selectedStyle);
+    
+    // Update content
+    descriptionContainer.innerHTML = `
+        <h3>${description.title}</h3>
+        <div class="description-content">
+            ${description.content}
+        </div>
+    `;
+
+    // Add highlighted class to content paragraphs after a brief delay for animation
+    setTimeout(() => {
+        const paragraphs = descriptionContainer.querySelectorAll('.description-content p');
+        paragraphs.forEach(p => p.classList.add('highlighted'));
+    }, 100);
+}
+
+// Function to update button active states
+function updateButtonStates(selectedStyle) {
+    const buttons = document.querySelectorAll('.learning-style-btn, .btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.onclick && btn.onclick.toString().includes(selectedStyle)) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+// Make functions globally available
+window.selectLearningStyle = selectLearningStyle;
 
 // Resources
 function fetchResources(style) {
@@ -114,7 +352,7 @@ function fetchTrends() {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Trend Score',
+                        label:'%',
                         data: scores,
                         backgroundColor: 'rgba(49, 130, 206, 0.7)',
                         borderColor: '#21364A',

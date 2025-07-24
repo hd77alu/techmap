@@ -1,13 +1,19 @@
 const db = require('./database');
 
 module.exports = {
+  // Get latest assessment for user
   getByUser: userId => new Promise((res, rej) => {
-    db.all("SELECT * FROM learning_styles WHERE user_id=?", [userId], (e, rows) => e ? rej(e) : res(rows));
+    db.get(
+      "SELECT visual, auditory, kinesthetic, reading, created_at FROM learning_styles WHERE user_id=? ORDER BY created_at DESC LIMIT 1",
+      [userId],
+      (e, row) => e ? rej(e) : res(row)
+    );
   }),
-  add: (userId, style) => new Promise((res, rej) => {
+  // Add new assessment (expects an object with all styles)
+  add: (userId, styles) => new Promise((res, rej) => {
     db.run(
-      "INSERT INTO learning_styles(user_id, style_type, assessment_date) VALUES(?,?,datetime('now'))",
-      [userId, style],
+      "INSERT INTO learning_styles(user_id, visual, auditory, kinesthetic, reading, created_at) VALUES(?,?,?,?,?,datetime('now'))",
+      [userId, styles.visual, styles.auditory, styles.kinesthetic, styles.reading],
       function(err) { err ? rej(err) : res(this.lastID); }
     );
   })
