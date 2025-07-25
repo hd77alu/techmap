@@ -632,4 +632,89 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = "visual-board.html";
         });
     }
+
+    // Scroll to Top Button Functionality with Overflow Fix
+    const scrollToTopBtn = document.getElementById('scrollToTop');
+    let isScrolling = false;
+    let scrollTimeout;
+    
+    if (scrollToTopBtn) {
+        // Show/hide button based on scroll position with debouncing
+        const handleScroll = () => {
+            if (!isScrolling) {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop > 200) {
+                    scrollToTopBtn.classList.add('visible');
+                } else {
+                    scrollToTopBtn.classList.remove('visible');
+                }
+            }
+        };
+
+        // Debounced scroll listener for better performance
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(handleScroll, 10);
+        });
+
+        // Enhanced smooth scroll to top with overflow prevention
+        scrollToTopBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (isScrolling) return; // Prevent multiple clicks
+            
+            isScrolling = true;
+            
+            // Temporarily disable CSS smooth scrolling to prevent conflicts
+            document.documentElement.style.scrollBehavior = 'auto';
+            
+            // Add visual feedback
+            scrollToTopBtn.style.transform = 'translateY(-1px) scale(0.95)';
+            scrollToTopBtn.classList.remove('visible'); // Hide immediately to prevent flicker
+            
+            // Custom smooth scroll implementation to avoid overflow
+            const startTime = performance.now();
+            const startPosition = window.pageYOffset;
+            const duration = 800; // Shorter duration for better control
+            
+            const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+            
+            const scrollAnimation = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = easeOutCubic(progress);
+                
+                const currentPosition = startPosition * (1 - easeProgress);
+                window.scrollTo(0, currentPosition);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(scrollAnimation);
+                } else {
+                    // Animation complete
+                    window.scrollTo(0, 0); // Ensure we're exactly at top
+                    
+                    // Re-enable CSS smooth scrolling
+                    document.documentElement.style.scrollBehavior = '';
+                    
+                    // Reset visual feedback
+                    setTimeout(() => {
+                        scrollToTopBtn.style.transform = '';
+                    }, 100);
+                    
+                    // Reset scrolling flag after a delay
+                    setTimeout(() => {
+                        isScrolling = false;
+                        // Check if button should be visible (it shouldn't be at top)
+                        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                        if (currentScroll <= 200) {
+                            scrollToTopBtn.classList.remove('visible');
+                        }
+                    }, 200);
+                }
+            };
+            
+            requestAnimationFrame(scrollAnimation);
+        });
+    }
 });
