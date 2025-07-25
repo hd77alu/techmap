@@ -59,7 +59,7 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
       description TEXT,
-      github_url TEXT,
+      url TEXT,
       industry TEXT,
       required_skills TEXT
     )
@@ -109,7 +109,7 @@ db.serialize(() => {
   `);
 
   db.run(`
-    INSERT INTO projects (name, description, github_url, industry, required_skills)
+    INSERT INTO projects (name, description, url, industry, required_skills)
     VALUES 
     ('Health Tracker App', 'A simple web app to monitor heart rate and steps.', 'https://github.com/example/health-tracker', 'Healthcare', 'JavaScript,HTML,CSS'),
     ('Stock Market Analyzer', 'Analyze stock trends using basic Python logic.', 'https://github.com/example/stock-analyzer', 'Finance', 'Python,Pandas,Matplotlib'),

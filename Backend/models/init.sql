@@ -20,17 +20,28 @@ CREATE TABLE IF NOT EXISTS learning_styles (
 
 CREATE TABLE IF NOT EXISTS resources (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  title TEXT NOT NULL,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL,
   url TEXT NOT NULL,
-  style TEXT CHECK(style IN ('visual', 'auditory', 'kinesthetic', 'reading')) NOT NULL,
-  technology TEXT NOT NULL
+  recommended_style TEXT NOT NULL,
+  tech_tags TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Seed sample resources
-INSERT INTO resources (title, url, style, technology) VALUES
-('React Visual Guide', 'https://example.com/react-visual', 'visual', 'React'),
-('JavaScript Audio Course', 'https://example.com/js-audio', 'auditory', 'JavaScript'),
-('Node.js Hands-On Lab', 'https://example.com/node-kinesthetic', 'kinesthetic', 'Node.js'),
-('Python Documentation', 'https://example.com/python-docs', 'reading', 'Python');
+CREATE TABLE IF NOT EXISTS projects (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  url TEXT NOT NULL,
+  industry TEXT NOT NULL,
+  required_skills TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
--- Add similar CREATE TABLE statements for projects, trending_data, resume_data
+CREATE TABLE IF NOT EXISTS trending_data (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  category TEXT NOT NULL,
+  item_name TEXT NOT NULL,
+  trend_score REAL NOT NULL,
+  update_date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
