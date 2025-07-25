@@ -4,46 +4,96 @@ function apiFetch(url, options = {}) {
         .then(res => {
             if (res.ok) return res.json();
             if (res.status === 401) {
-                console.log('User not authenticated');
+                // Redirect to welcome page if not authenticated
+                window.location.href = '/';
                 return Promise.reject({ status: 401, message: 'Not authenticated' });
             }
             return Promise.reject(res);
         });
 }
 
-// Helper to check login state using localStorage
-function isUserLoggedIn() {
-    return localStorage.getItem("userLoggedIn") === "true";
-}
-
-// Auth
-document.getElementById('loginBtn').onclick = () => {
-    // Try Google OAuth first, fallback to localStorage simulation
-    window.location = '/auth/google';
-    // Note: If Google OAuth fails, the localStorage simulation will be handled by the profile function
-};
-
+// Logout functionality
 document.getElementById('logoutBtn').onclick = () => {
-    // Clear localStorage and try Google logout
-    localStorage.removeItem("userLoggedIn");
     window.location = '/auth/logout';
 };
 
-// Profile
+// Profile - Fetch user info
 function fetchProfile() {
     apiFetch('/api/user')
         .then(data => {
-            // Assume username is in data.name or data.username
             const username = data.name || data.username || "User";
-            document.getElementById('profile').innerHTML = `<div class="welcome-box">Welcome, <span class="username">${username}</span>!</div>`;
-            // Set localStorage to indicate successful login
-            localStorage.setItem("userLoggedIn", "true");
+            const firstName = username.split(' ')[0]; // Get first name only
+            document.getElementById('profile').innerHTML = `
+                <div class="welcome-message" onclick="celebrateUser()">
+                    <span class="wave-emoji">👋</span>
+                    <span class="welcome-text">Welcome back, <span class="username">${firstName}</span>!</span>
+                </div>
+            `;
+            
+            // Add animation class after a brief delay
+            setTimeout(() => {
+                const welcomeMsg = document.querySelector('.welcome-message');
+                if (welcomeMsg) {
+                    welcomeMsg.classList.add('animated');
+                }
+            }, 100);
         })
         .catch(() => {
-            // Display "You are not logged in" when Google OAuth fails
-            document.getElementById('profile').innerHTML = '<div class="welcome-box">You are not logged in</div>';
+            // If profile fetch fails, redirect to welcome
+            window.location.href = '/';
         });
 }
+
+// Fun celebration function for when user clicks the welcome message
+function celebrateUser() {
+    const welcomeMsg = document.querySelector('.welcome-message');
+    if (welcomeMsg) {
+        // Add a celebration class temporarily
+        welcomeMsg.classList.add('celebrating');
+        
+        // Create floating emojis
+        const emojis = ['🎉', '✨', '🚀', '💫', '🎊'];
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                createFloatingEmoji(emojis[Math.floor(Math.random() * emojis.length)]);
+            }, i * 100);
+        }
+        
+        // Remove celebration class after animation
+        setTimeout(() => {
+            welcomeMsg.classList.remove('celebrating');
+        }, 600);
+    }
+}
+
+// Create floating emoji animation
+function createFloatingEmoji(emoji) {
+    const floatingEmoji = document.createElement('span');
+    floatingEmoji.textContent = emoji;
+    floatingEmoji.style.cssText = `
+        position: fixed;
+        font-size: 1.5rem;
+        pointer-events: none;
+        z-index: 1000;
+        left: ${Math.random() * window.innerWidth}px;
+        top: ${window.innerHeight}px;
+        animation: float-up 2s ease-out forwards;
+    `;
+    
+    document.body.appendChild(floatingEmoji);
+    
+    // Remove emoji after animation
+    setTimeout(() => {
+        if (floatingEmoji.parentNode) {
+            floatingEmoji.parentNode.removeChild(floatingEmoji);
+        }
+    }, 2000);
+}
+
+// Make function globally available
+window.celebrateUser = celebrateUser;
+
+// Initialize dashboard
 fetchProfile();
 
 // Fetch and display user's learning style assessment in descending order
@@ -64,7 +114,7 @@ function fetchLearningStyleAssessment() {
             const styleResultsHeading = document.getElementById('styleResultsHeading');
             if (styleResultsHeading) styleResultsHeading.textContent = 'Based On VARK Assessment Results:';
             
-            // Clear the old style list display as we'll show it with buttons now
+            // Learning Style Results
             const styleResultsDiv = document.getElementById('styleResults');
             if (styleResultsDiv) styleResultsDiv.innerHTML = '';
 
@@ -105,7 +155,7 @@ function fetchLearningStyleAssessment() {
                 ).join('');
             }
 
-            // Optionally, auto-fetch resources for top style
+            // Auto-fetch resources for top style
             if (styleScores[0]) fetchResources(styleScores[0][0]);
         } else {
             // No quiz data, show default buttons (simple style without percentages)
@@ -121,7 +171,7 @@ function fetchLearningStyleAssessment() {
                     ([label, styleClass]) => `<button onclick="selectLearningStyle('${styleClass}')" class="btn ${styleClass}">${label}</button>`
                 ).join('');
             }
-            // Also set default resource buttons
+            // Set default resource buttons
             const resBtnGroup = document.querySelector('#nav-resources .btn-group');
             if (resBtnGroup) {
                 resBtnGroup.innerHTML = defaultStyles.map(
@@ -191,6 +241,9 @@ function fetchLearningStyleAssessment() {
 
 // Call this after login/profile loaded
 fetchLearningStyleAssessment();
+
+// Auto-load trends chart
+fetchTrends();
 
 // Define learning style descriptions
 const learningStyleDescriptions = {
@@ -348,45 +401,211 @@ window.fetchProjects = fetchProjects;
 function fetchTrends() {
     apiFetch('/api/trends')
         .then(data => {
-            // Prepare data for Chart.js
-            let trends = Array.isArray(data) ? data : [data];
-            const labels = trends.map(trend => trend.item_name || trend.category || 'Unknown');
-            const scores = trends.map(trend => trend.trend_score || 0);
+            // Group data by category
+            const categorizedData = {};
+            const trends = Array.isArray(data) ? data : [data];
+            
+            trends.forEach(trend => {
+                const category = trend.category || 'Other';
+                if (!categorizedData[category]) {
+                    categorizedData[category] = [];
+                }
+                categorizedData[category].push(trend);
+            });
 
-            // Remove previous chart if exists
-            if (window.trendsChartInstance) {
-                window.trendsChartInstance.destroy();
-            }
-
-            // Create chart
-            const ctx = document.getElementById('trendsChart').getContext('2d');
-            window.trendsChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label:'%',
-                        data: scores,
-                        backgroundColor: 'rgba(49, 130, 206, 0.7)',
-                        borderColor: '#21364A',
-                        borderWidth: 2,
-                        borderRadius: 8,
-                    }]
+            // Chart configurations for each category
+            const chartConfigs = {
+                'Language': {
+                    title: 'Top 15 Most Popular Programming Languages',
+                    description: 'JavaScript has been the most used language according to Stack Overflow 2024 developers survey.',
+                    limit: 15,
+                    colors: ['#f7df1e', '#3178c6', '#e34c26', '#1572b6', '#c6538c', '#00d8ff', '#61dafb', '#764abc', '#ff6b6b', '#4fc08d', '#ff9500', '#8892bf', '#326ce5', '#e34f26', '#007acc']
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        title: { display: true, text: 'Trends Overview' }
-                    },
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
+                'Framework': {
+                    title: 'Top 10 Most Popular Web Frameworks',
+                    description: "Node.js peaked in 2020 with its highest recorded usage score of 51%. While not as popular, it's still the most used web technology in the Stack Overflow 2024 developers survey and has increased popularity among those learning to code from last year.",
+                    limit: 10,
+                    colors: ['#68a063', '#61dafb', '#4fc08d', '#ff2d20', '#e23237', '#ed8611ff', '#764abc', '#ff6b6b', '#0ea5e9', '#7c3aed']
+                },
+                'Database': {
+                    title: 'Top 10 Most Used Databases',
+                    description: 'PostgreSQL debuted in Stack Overflow developer survey in 2018 when 33% of developers reported using it, compared with the most popular option that year: MySQL, in use by 59% of developers. Six years later, PostgreSQL is used by 49% of developers and is the most popular database for the second year in a row.',
+                    limit: 10,
+                    colors: ['#336791', '#00758f', '#ff6600', '#e97627', '#4db33d', '#005c98', '#dc382d', '#326ce5', '#f29111', '#00758f']
+                },
+                'Developer Tool': {
+                    title: 'Top 10 Most Used Developer Tools for Compiling, Building and Testing',
+                    description: 'Docker is used the most by professional developers (59%) and npm is used the most by developers learning to code (45%) according to Stack Overflow 2024 developers survey.',
+                    limit: 10,
+                    colors: ['#2496ed', '#cb3837', '#f05032', '#6cc644', '#47a248', '#ff6b6b', '#764abc', '#e34c26', '#1572b6', '#326ce5']
+                },
+                'Cloud Platform': {
+                    title: 'Top 10 Most Used Cloud Platforms',
+                    description: "AWS' share of usage amongst respondents is the same in Stack Overflow 2024 developers survey as in 2023, while Azure and Google Cloud increased their share. Azure has climbed from 26% to 28% usage and Google Cloud went from 24% to 25%.",
+                    limit: 10,
+                    colors: ['#ff9900', '#0078d4', '#4285f4', '#ff6b6b', '#326ce5', '#e97627', '#68a063', '#f29111', '#0ea5e9', '#7c3aed']
+                },
+                'Management Tool': {
+                    title: 'Top 10 Most Used Project Management Tools',
+                    description: 'Jira and Confluence top the list for most used asynchronous tools developers use for the third year in Stack Overflow survey.',
+                    limit: 10,
+                    colors: ['#0052cc', '#172b4d', '#61dafb', '#68a063', '#ff6b6b', '#e97627', '#4285f4', '#f29111', '#0ea5e9', '#7c3aed']
+                },
+                'Job Role': {
+                    title: 'Most In-Demand Tech Jobs in 2025',
+                    description: 'According to Reveal survey on software development challenges in 2025, The AI talent shortage, which saw some improvement in 2024, has worsened in 2025—especially in AI and cybersecurity roles. Companies that rapidly adopted AI now lack the specialized workforce needed to scale, refine, and secure their AI-driven infrastructure.\n\nThere is a strong demand for skilled AI engineers, with 28% of tech leaders finding it challenging to fill AI engineer positions. While the adoption of AI has helped companies optimize workflows, it has also opened new job opportunities that they are still struggling to fill.',
+                    limit: 10,
+                    colors: ['#ff6b6b', '#4fc08d', '#f7df1e', '#3178c6', '#e34c26', '#61dafb', '#764abc', '#68a063', '#ff9500', '#e97627']
+                },
+                'Software Challenges': {
+                    title: 'The Biggest Software Development Challenges in 2025',
+                    description: 'Tech leaders identify the biggest software development challenges as security (51%) and data privacy (41%), along with AI deployment (44%) and the quality/reliability of AI code (45%).\n\nThe majority of tech leaders now believe that security can no longer be an afterthought—it must be integrated into AI development from the start. Companies need real-time threat detection, AI auditing, and compliance-driven security measures to stay ahead of evolving threats.',
+                    limit: 10,
+                    colors: ['#dc2626', '#ea580c', '#d97706', '#ca8a04', '#65a30d', '#16a34a', '#059669', '#0891b2', '#0284c7', '#2563eb']
+                }
+            };
+
+            // Clear previous content
+            const trendsContainer = document.getElementById('trendsContainer');
+            if (!trendsContainer) return;
+
+            // Destroy existing chart instances
+            if (window.trendsChartInstances) {
+                window.trendsChartInstances.forEach(instance => instance.destroy());
+            }
+            window.trendsChartInstances = [];
+
+            trendsContainer.innerHTML = '';
+
+            // Create charts for each category
+            Object.keys(categorizedData).forEach(category => {
+                const config = chartConfigs[category];
+                if (!config) return;
+
+                const categoryData = categorizedData[category]
+                    .sort((a, b) => (b.trend_score || 0) - (a.trend_score || 0))
+                    .slice(0, config.limit);
+
+                if (categoryData.length === 0) return;
+
+                // Create chart container
+                const chartSection = document.createElement('div');
+                chartSection.className = 'trend-chart-section';
+                chartSection.innerHTML = `
+                    <div class="trend-chart-header">
+                        <h3 class="trend-chart-title">${config.title}</h3>
+                        <p class="trend-chart-description">${config.description}</p>
+                    </div>
+                    <div class="trend-chart-wrapper">
+                        <canvas id="trendsChart${category.replace(/\s+/g, '')}" width="600" height="400"></canvas>
+                    </div>
+                `;
+
+                trendsContainer.appendChild(chartSection);
+
+                // Create chart
+                const canvas = document.getElementById(`trendsChart${category.replace(/\s+/g, '')}`);
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Improved label extraction - ensure we get item_name if it exists
+                    const labels = categoryData.map(item => {
+                        const itemName = item.item_name?.trim();
+                        const category = item.category?.trim();
+                        
+                        // Prioritize item_name, but only if it's a non-empty string
+                        if (itemName && itemName !== '' && itemName !== 'null' && itemName !== 'undefined') {
+                            return itemName;
+                        } else if (category && category !== '' && category !== 'null' && category !== 'undefined') {
+                            return category;
+                        } else {
+                            return 'Unknown';
+                        }
+                    });
+
+                    const chartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Usage %',
+                                data: categoryData.map(item => item.trend_score || 0),
+                                backgroundColor: config.colors.slice(0, categoryData.length),
+                                borderColor: config.colors.slice(0, categoryData.length).map(color => color + '80'),
+                                borderWidth: 2,
+                                borderRadius: 8,
+                                borderSkipped: false,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { 
+                                    display: false 
+                                },
+                                title: { 
+                                    display: false 
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.dataset.label + ': ' + context.parsed.y + '%';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: { 
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value + '%';
+                                        }
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 0
+                                    }
+                                }
+                            },
+                            layout: {
+                                padding: {
+                                    top: 20,
+                                    bottom: 20
+                                }
+                            }
+                        }
+                    });
+
+                    window.trendsChartInstances.push(chartInstance);
                 }
             });
+
+            // Add source links at the bottom
+            const sourcesSection = document.createElement('div');
+            sourcesSection.className = 'trend-sources';
+            sourcesSection.innerHTML = `
+                <h4>Data Sources:</h4>
+                <div class="source-links">
+                    <a href="https://www.revealbi.io/whitepapers/reveal-survey-report-top-software-development-challenges-for-2025" target="_blank" rel="noopener noreferrer">
+                        Reveal Survey on Software Development Challenges in 2025
+                    </a>
+                    <a href="https://survey.stackoverflow.co/2024/technology" target="_blank" rel="noopener noreferrer">
+                        Stack Overflow 2024 Developers Survey
+                    </a>
+                </div>
+            `;
+            trendsContainer.appendChild(sourcesSection);
+
         })
         .catch(() => {
-            document.getElementById('trends').innerHTML = '<div class="card">Error fetching trends</div>';
+            const trendsContainer = document.getElementById('trendsContainer');
+            if (trendsContainer) {
+                trendsContainer.innerHTML = '<div class="card">Error fetching trends data</div>';
+            }
         });
 }
 window.fetchTrends = fetchTrends;
@@ -404,49 +623,13 @@ function analyzeResume() {
 }
 window.analyzeResume = analyzeResume;
 
-// Vision Board access control
+// Vision Board access
 document.addEventListener('DOMContentLoaded', () => {
     const visionBoardBtn = document.getElementById("visionBoardBtn");
     if (visionBoardBtn) {
         visionBoardBtn.addEventListener("click", function (e) {
             e.preventDefault();
-            if (!isUserLoggedIn()) {
-                // Show a subtle message instead of alert
-                const profile = document.getElementById('profile');
-                const originalText = profile.innerHTML;
-                profile.innerHTML = '<div class="welcome-box" style="color: #ff6b6b;">Please log in first to access your Tech Vision Board</div>';
-                setTimeout(() => {
-                    profile.innerHTML = originalText;
-                }, 3000);
-            } else {
-                window.location.href = "visual-board.html";
-            }
-        });
-    }
-
-    // Add localStorage simulation for login button
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    
-    if (loginBtn) {
-        loginBtn.addEventListener("click", () => {
-            // Set a timeout to simulate login if Google OAuth doesn't work
-            setTimeout(() => {
-                if (!isUserLoggedIn()) {
-                    localStorage.setItem("userLoggedIn", "true");
-                    fetchProfile(); // Update profile display
-                }
-            }, 2000); // Wait 2 seconds for potential Google OAuth redirect
-        });
-    }
-
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", () => {
-            localStorage.removeItem("userLoggedIn");
-            // Update profile immediately for localStorage simulation
-            setTimeout(() => {
-                fetchProfile(); // Update profile display
-            }, 100);
+            window.location.href = "visual-board.html";
         });
     }
 });

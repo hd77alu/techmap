@@ -7,14 +7,6 @@
   <link rel="stylesheet" href="styles.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="index.js"></script>
-  <!-- 🔁 Redirect to welcome.html if needed -->
-  <script>
-    // Optional: Add a simple condition so users don't get redirected repeatedly
-    if (!sessionStorage.getItem('visited')) {
-      sessionStorage.setItem('visited', 'true');
-      window.location.href = "welcome.html";
-    }
-  </script>
 </head>
 <body>
   <header class="header">
@@ -33,19 +25,36 @@
     </nav>
   </header>
 
-  <div class="login-container">
-    <button class="log-btn" id="loginBtn">Login with Google</button>
-    <button class="log-btn" id="logoutBtn">Logout</button>
+  <div class="dashboard-header">
+    <div id="profile" class="welcome-box">Welcome!</div>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
   </div>
 
   <section class="welcome-section">
-    <div id="profile" class="welcome-box">Welcome, Jane!</div>
-    <p class="intro-text">
+    <p class="intro-card">
       Techmap is designed to help bridge the gap between academic learning and industry demand,
       empowering Software Engineering students for success in the professional world.
     </p>
-<a href="quiz.html" class="quiz-btn">Take Learning Style Quiz</a>
-<a href="#" id="visionBoardBtn" class="quiz-btn">Go to Tech Vision Board</a>
+    
+    <div class="action-cards">
+      <div class="action-card">
+        <p class="intro-text">
+          <strong>Discover Your Learning Style:</strong> Take our comprehensive VARK assessment to understand how you learn best. 
+          Whether you're a visual, auditory, kinesthetic, or reading/writing learner, knowing your style will help you 
+          choose the most effective study methods and career paths tailored to your strengths.
+        </p>
+        <a href="quiz.html" class="quiz-btn">Take Learning Style Quiz</a>
+      </div>
+      
+      <div class="action-card">
+        <p class="intro-text">
+          <strong>Visualize Your Tech Journey:</strong> Create an inspiring vision board that maps out your technology career goals. 
+          Explore different tech domains, set milestones, and track your progress as you build the skills needed to achieve 
+          your dream role in the software industry.
+        </p>
+        <a href="visual-board.html" id="visionBoardBtn" class="quiz-btn">Go to The Vision Board</a>
+      </div>
+    </div>
   </section>
 
   <section id="nav-style">
@@ -68,9 +77,10 @@
   </section>
 
   <section id="nav-trends">
-    <h2>Software Industry insights</h2>
-    <button onclick="fetchTrends()" class="btn visual">Show Trends</button>
-    <canvas id="trendsChart" width="600" height="300"></canvas>
+    <h2>Software Industry Insights</h2>
+    <div id="trendsContainer">
+      <!-- Charts will be dynamically generated here -->
+    </div>
   </section>
 
   <section id="nav-resources">
