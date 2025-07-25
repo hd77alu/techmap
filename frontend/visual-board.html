@@ -15,14 +15,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #8b5cf6;
+      color: #4e06f5;
       font-size: 0.875rem;
       text-align: center;
       height: 160px;
       position: relative;
     }
     .image-placeholder svg {
-      stroke: #8b5cf6;
+      stroke: #4a06ea;
       stroke-width: 2;
       width: 36px;
       height: 36px;
@@ -48,14 +48,30 @@
       overflow-y: auto;
       padding-right: 8px;
     }
+    /* Match main site background */
+    body {
+      background: linear-gradient(to bottom right, #0a1120, #0f1a24);
+    }
   </style>
 </head>
-<body class="bg-gradient-to-tr from-indigo-600 to-blue-400 min-h-screen text-gray-800 flex flex-col items-center py-8 px-4">
-  <header class="mb-8 text-center max-w-4xl w-full">
+<body class="min-h-screen text-gray-800 flex flex-col items-center py-8 px-4">
+  <header class="mb-8 text-center max-w-4xl w-full relative">
+    <!-- Back to Dashboard Button -->
+    <div class="absolute left-0 top-0">
+      <button onclick="window.location.href='index.html'" 
+              class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition flex items-center gap-2"
+              aria-label="Back to Dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Back to Dashboard
+      </button>
+    </div>
+    
     <h1 class="text-4xl font-extrabold text-white mb-1 select-none">
-      <span aria-hidden="true">✨</span>
+      <span aria-hidden="true"></span>
       Tech Vision Board
-      <span aria-hidden="true">✨</span>
+      <span aria-hidden="true"></span>
     </h1>
     <p class="text-indigo-200 max-w-md mx-auto select-none">Visualize your tech dreams and make them reality</p>
   </header>
@@ -328,7 +344,6 @@
           goalTextarea.focus();
           return;
         }
-        // Optional: deadline validation could be added here
 
         // Update display text
         goalTextDiv.textContent = goalVal + (deadlineVal ? ` (Deadline: ${deadlineVal})` : '');

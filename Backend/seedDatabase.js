@@ -33,7 +33,7 @@ function cleanCommaSeparated(value) {
 
 // Function to seed resources table
 async function seedResources(data) {
-    console.log('📚 Seeding resources table...');
+    console.log('Seeding resources table...');
     const stmt = db.prepare(`
         INSERT OR REPLACE INTO resources (name, type, url, recommended_style, tech_tags)
         VALUES (?, ?, ?, ?, ?)

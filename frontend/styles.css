@@ -8,6 +8,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 body {
@@ -15,6 +16,7 @@ body {
   background: linear-gradient(to bottom right, #0a1120, #0f1a24);
   color: #fff;
   padding-bottom: 4rem;
+  overflow-x: hidden;
 }
 
 header {
@@ -866,5 +868,87 @@ textarea {
   .logout-btn {
     font-size: 0.8rem;
     padding: 0.5rem 1rem;
+  }
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #3182ce, #60a5fa);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(49, 130, 206, 0.4);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* Slower, smoother transition */
+  z-index: 1001; /* Higher z-index to prevent overlap issues */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity; /* Optimize for animations */
+}
+
+.scroll-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.scroll-to-top:hover {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(49, 130, 206, 0.6);
+}
+
+.scroll-to-top:active {
+  transform: translateY(-1px) scale(0.95);
+  box-shadow: 0 4px 12px rgba(49, 130, 206, 0.4);
+  transition: all 0.15s ease;
+}
+
+.scroll-to-top svg {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
+  pointer-events: none; /* Prevent SVG from interfering with button clicks */
+}
+
+.scroll-to-top:hover svg {
+  transform: translateY(-2px);
+}
+
+/* Mobile adjustments for scroll to top */
+@media (max-width: 768px) {
+  .scroll-to-top {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 45px;
+    height: 45px;
+  }
+  
+  .scroll-to-top svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll-to-top {
+    bottom: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .scroll-to-top svg {
+    width: 18px;
+    height: 18px;
   }
 }
