@@ -33,7 +33,6 @@ function getProjects(req, res) {
 
     db.all(query, queryParams, (err, rows) => {
         if (err) {
-            console.error('Database error:', err);
             return res.status(500).json({ error: 'Database error' });
         }
         
@@ -46,7 +45,6 @@ function getProjects(req, res) {
         // Get total count for pagination
         db.get(countQuery, params, (countErr, countRow) => {
             if (countErr) {
-                console.error('Database error:', countErr);
                 return res.status(500).json({ error: 'Database error' });
             }
             res.json({

@@ -18,10 +18,10 @@ function getResources(req, res) {
         params.push(`%${style}%`);
     }
 
-    // Search functionality - enhanced to search description as well
+    // Search functionality - search in available columns only
     if (search) {
-        filters += ' AND (name LIKE ? OR description LIKE ? OR type LIKE ? OR tech_tags LIKE ?)';
-        params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
+        filters += ' AND (name LIKE ? OR type LIKE ? OR tech_tags LIKE ?)';
+        params.push(`%${search}%`, `%${search}%`, `%${search}%`);
     }
 
     // Type filter
@@ -39,7 +39,6 @@ function getResources(req, res) {
 
     db.all(query, queryParams, (err, rows) => {
         if (err) {
-            console.error('Database error:', err);
             return res.status(500).json({ error: 'Database error' });
         }        // Process comma-separated values
         const processedRows = rows.map(row => ({
@@ -50,7 +49,6 @@ function getResources(req, res) {
         // Get total count for current filters
         db.get(countQuery, params, (countErr, countRow) => {
             if (countErr) {
-                console.error('Database error:', countErr);
                 return res.status(500).json({ error: 'Database error' });
             }
             res.json({

@@ -24,7 +24,6 @@ module.exports = {
 
     db.all(query, params, (err, rows) => {
         if (err) {
-            console.error('Database error in getByStyle:', err);
             rej(err);
         } else {
             res(rows || []);
@@ -35,7 +34,6 @@ module.exports = {
   getAll: () => new Promise((res, rej) => {
     db.all("SELECT * FROM resources ORDER BY name", [], (err, rows) => {
         if (err) {
-            console.error('Database error in getAll:', err);
             rej(err);
         } else {
             res(rows || []);
