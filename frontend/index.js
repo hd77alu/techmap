@@ -343,59 +343,326 @@ function updateButtonStates(selectedStyle) {
 // Make functions globally available
 window.selectLearningStyle = selectLearningStyle;
 
-// Resources
-function fetchResources(style) {
-    apiFetch(`/api/resources?style=${encodeURIComponent(style)}`)
-        .then(data => {
-            if (Array.isArray(data) && data.length) {
-                document.getElementById('resources').innerHTML = data.map(resource => {
-                    let links = '';
-                    if (resource.link) {
-                        links += `<a href="${resource.link}" target="_blank">Resource Link</a> `;
-                    }
-                    if (resource.url) {
-                        links += `<a href="${resource.url}" target="_blank">More Info</a>`;
-                    }
-                    return `<div class="card">
-                        <h3>${resource.title || resource.name}</h3>
-                        <p>${resource.description || ''}</p>
-                        ${links}
-                    </div>`;
-                }).join('');
-            } else {
-                document.getElementById('resources').innerHTML = '<div class="card">No resources found.</div>';
-            }
-        })
-        .catch(() => document.getElementById('resources').innerHTML = '<div class="card">Error fetching resources</div>');
-}
-window.fetchResources = fetchResources;
+// Pagination state for resources
+let resourcePagination = {
+    limit: 10,
+    offset: 0,
+    total: 0,
+    search: '',
+    style: '',
+    type: '',
+    sort: 'name',
+    data: []
+};
 
-// Projects
-function fetchProjects() {
-    apiFetch('/api/projects')
-        .then(data => {
-            if (Array.isArray(data) && data.length) {
-                document.getElementById('projects').innerHTML = data.map(project => {
-                    let links = '';
-                    if (project.github) {
-                        links += `<a href="${project.github}" target="_blank">GitHub</a> `;
-                    }
-                    if (project.url) {
-                        links += `<a href="${project.url}" target="_blank">Project Link</a>`;
-                    }
-                    return `<div class="card">
-                        <h3>${project.title || project.name}</h3>
-                        <p><strong>Industry:</strong> ${project.industry || project.domain || project.category || 'N/A'}</p>
-                        ${links}
-                    </div>`;
-                }).join('');
+// Enhanced Resources Function with Pagination
+function fetchResources(style = '', search = '', type = '', sort = 'name', append = false) {
+    // Update pagination state
+    if (!append) {
+        resourcePagination = { ...resourcePagination, style, search, type, sort, offset: 0, data: [] };
+    }
+    const { limit, offset } = resourcePagination;
+    const params = new URLSearchParams();
+    if (style) params.append('style', style);
+    if (search) params.append('search', search);
+    if (type) params.append('type', type);
+    if (sort) params.append('sort', sort);
+    params.append('limit', limit);
+    params.append('offset', offset);
+
+    apiFetch(`/api/resources?${params}`)
+        .then(result => {
+            const { data, total } = result;
+            resourcePagination.total = total;
+            if (append) {
+                resourcePagination.data = resourcePagination.data.concat(data);
             } else {
-                document.getElementById('projects').innerHTML = '<div class="card">No projects found.</div>';
+                resourcePagination.data = data;
+            }
+            displayResources(resourcePagination.data);
+            updateResultsInfo('resources', resourcePagination.data.length, search);
+            // Show/hide Show More button
+            const showMoreBtn = document.getElementById('showMoreResources');
+            if (showMoreBtn) {
+                if (resourcePagination.data.length < total) {
+                    showMoreBtn.style.display = '';
+                } else {
+                    showMoreBtn.style.display = 'none';
+                }
             }
         })
-        .catch(() => document.getElementById('projects').innerHTML = '<div class="card">Error fetching projects</div>');
+        .catch(() => {
+            document.getElementById('resources').innerHTML = '<div class="card no-results">Error fetching resources</div>';
+            const showMoreBtn = document.getElementById('showMoreResources');
+            if (showMoreBtn) showMoreBtn.style.display = 'none';
+        });
 }
-window.fetchProjects = fetchProjects;
+
+// Pagination state for projects
+let projectPagination = {
+    limit: 10,
+    offset: 0,
+    total: 0,
+    search: '',
+    industry: '',
+    skill: '',
+    sort: 'name',
+    data: []
+};
+
+// Enhanced Projects Function with Pagination
+function fetchProjects(search = '', industry = '', skill = '', sort = 'name', append = false) {
+    // Update pagination state
+    if (!append) {
+        projectPagination = { ...projectPagination, search, industry, skill, sort, offset: 0, data: [] };
+    }
+    const { limit, offset } = projectPagination;
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (industry) params.append('industry', industry);
+    if (skill) params.append('skill', skill);
+    if (sort) params.append('sort', sort);
+    params.append('limit', limit);
+    params.append('offset', offset);
+
+    apiFetch(`/api/projects?${params}`)
+        .then(result => {
+            const { data, total } = result;
+            projectPagination.total = total;
+            if (append) {
+                projectPagination.data = projectPagination.data.concat(data);
+            } else {
+                projectPagination.data = data;
+            }
+            displayProjects(projectPagination.data);
+            updateResultsInfo('projects', projectPagination.data.length, search);
+            // Show/hide Show More button
+            const showMoreBtn = document.getElementById('showMoreProjects');
+            if (showMoreBtn) {
+                if (projectPagination.data.length < total) {
+                    showMoreBtn.style.display = '';
+                } else {
+                    showMoreBtn.style.display = 'none';
+                }
+            }
+        })
+        .catch(() => {
+            document.getElementById('projects').innerHTML = '<div class="card no-results">Error fetching projects</div>';
+            const showMoreBtn = document.getElementById('showMoreProjects');
+            if (showMoreBtn) showMoreBtn.style.display = 'none';
+        });
+}
+
+// Display Functions
+function displayResources(data) {
+    const container = document.getElementById('resources');
+    if (!Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<div class="card no-results">No resources found matching your criteria.</div>';
+        return;
+    }
+
+    container.innerHTML = data.map(resource => {
+        const techTags = resource.tech_tags_array || [];
+        const styles = resource.recommended_styles || [];
+        
+        return `
+            <div class="card">
+                <h3>${resource.name}</h3>
+                <p><strong>Type:</strong> ${resource.type || 'N/A'}</p>
+                <p><strong>Learning Styles:</strong> ${styles.join(', ') || 'N/A'}</p>
+                <p><strong>Tech Tags:</strong> ${techTags.join(', ') || 'N/A'}</p>
+                ${resource.url ? `<a href="${resource.url}" target="_blank">View Resource</a>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+function displayProjects(data) {
+    const container = document.getElementById('projects');
+    if (!Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<div class="card no-results">No projects found matching your criteria.</div>';
+        return;
+    }
+
+    container.innerHTML = data.map(project => {
+        const skills = project.required_skills_array || [];
+        
+        return `
+            <div class="card">
+                <h3>${project.name}</h3>
+                <p>${project.description || ''}</p>
+                <p><strong>Industry:</strong> ${project.industry || 'N/A'}</p>
+                <p><strong>Required Skills:</strong> ${skills.join(', ') || 'N/A'}</p>
+                ${project.url ? `<a href="${project.url}" target="_blank">View Project</a>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+// Helper Functions
+function updateResultsInfo(section, count, search) {
+    const infoId = `${section}Info`;
+    let infoDiv = document.getElementById(infoId);
+    
+    if (!infoDiv) {
+        infoDiv = document.createElement('div');
+        infoDiv.id = infoId;
+        infoDiv.className = 'results-info';
+        document.getElementById(section).parentNode.insertBefore(infoDiv, document.getElementById(section));
+    }
+    
+    let text = `Found ${count} ${section}`;
+    if (search) text += ` matching "${search}"`;
+    infoDiv.textContent = text;
+}
+
+// Initialize Search Functionality
+document.addEventListener('DOMContentLoaded', () => {
+    // Resource Search
+    const resourceSearch = document.getElementById('resourceSearch');
+    const clearResourceSearch = document.getElementById('clearResourceSearch');
+    const showMoreBtn = document.getElementById('showMoreResources');
+    
+    if (resourceSearch) {
+        let searchTimeout;
+        resourceSearch.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                fetchResources('', e.target.value);
+            }, 300);
+        });
+    }
+    
+    if (clearResourceSearch) {
+        clearResourceSearch.addEventListener('click', () => {
+            resourceSearch.value = '';
+            fetchResources();
+        });
+    }
+
+    // Show More for Resources
+    if (showMoreBtn) {
+        showMoreBtn.addEventListener('click', () => {
+            resourcePagination.offset += resourcePagination.limit;
+            fetchResources(resourcePagination.style, resourcePagination.search, resourcePagination.type, resourcePagination.sort, true);
+        });
+    }
+
+    // Project Search
+    const projectSearch = document.getElementById('projectSearch');
+    const clearProjectSearch = document.getElementById('clearProjectSearch');
+    const showMoreProjectsBtn = document.getElementById('showMoreProjects');
+    
+    if (projectSearch) {
+        let searchTimeout;
+        projectSearch.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                fetchProjects(e.target.value);
+            }, 300);
+        });
+    }
+    
+    if (clearProjectSearch) {
+        clearProjectSearch.addEventListener('click', () => {
+            projectSearch.value = '';
+            fetchProjects();
+        });
+    }
+
+    // Show More for Projects
+    if (showMoreProjectsBtn) {
+        showMoreProjectsBtn.addEventListener('click', () => {
+            projectPagination.offset += projectPagination.limit;
+            fetchProjects(projectPagination.search, projectPagination.industry, projectPagination.skill, projectPagination.sort, true);
+        });
+    }
+
+    // Scroll to Top Button Functionality with Overflow Fix
+    const scrollToTopBtn = document.getElementById('scrollToTop');
+    let isScrolling = false;
+    let scrollTimeout;
+    
+    if (scrollToTopBtn) {
+        // Show/hide button based on scroll position with debouncing
+        const handleScroll = () => {
+            if (!isScrolling) {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                if (scrollTop > 200) {
+                    scrollToTopBtn.classList.add('visible');
+                } else {
+                    scrollToTopBtn.classList.remove('visible');
+                }
+            }
+        };
+
+        // Debounced scroll listener for better performance
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(handleScroll, 10);
+        });
+
+        // Enhanced smooth scroll to top with overflow prevention
+        scrollToTopBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (isScrolling) return; // Prevent multiple clicks
+            
+            isScrolling = true;
+            
+            // Temporarily disable CSS smooth scrolling to prevent conflicts
+            document.documentElement.style.scrollBehavior = 'auto';
+            
+            // Add visual feedback
+            scrollToTopBtn.style.transform = 'translateY(-1px) scale(0.95)';
+            scrollToTopBtn.classList.remove('visible'); // Hide immediately to prevent flicker
+            
+            // Custom smooth scroll implementation to avoid overflow
+            const startTime = performance.now();
+            const startPosition = window.pageYOffset;
+            const duration = 800; // Shorter duration for better control
+            
+            const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+            
+            const scrollAnimation = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = easeOutCubic(progress);
+                
+                const currentPosition = startPosition * (1 - easeProgress);
+                window.scrollTo(0, currentPosition);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(scrollAnimation);
+                } else {
+                    // Animation complete
+                    window.scrollTo(0, 0); // Ensure we're exactly at top
+                    
+                    // Re-enable CSS smooth scrolling
+                    document.documentElement.style.scrollBehavior = '';
+                    
+                    // Reset visual feedback
+                    setTimeout(() => {
+                        scrollToTopBtn.style.transform = '';
+                    }, 100);
+                    
+                    // Reset scrolling flag after a delay
+                    setTimeout(() => {
+                        isScrolling = false;
+                        // Check if button should be visible (it shouldn't be at top)
+                        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+                        if (currentScroll <= 200) {
+                            scrollToTopBtn.classList.remove('visible');
+                        }
+                    }, 200);
+                }
+            };
+            
+            requestAnimationFrame(scrollAnimation);
+        });
+    }
+});
 
 // Trends
 function fetchTrends() {

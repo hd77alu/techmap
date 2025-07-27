@@ -84,14 +84,30 @@
 
   <section id="nav-resources">
     <h2>Resources</h2>
+    <!-- Add this search container -->
+    <div class="search-filter-container">
+      <div class="search-box">
+        <input type="text" id="resourceSearch" placeholder="Search resources by name, type, or tech tags..." />
+        <button id="clearResourceSearch">✕</button>
+      </div>
+    </div>
     <div class="btn-group"></div>
     <div id="resources" class="card-list"></div>
+    <button id="showMoreResources" class="show-more-btn" style="display:none; margin: 1rem auto;">Show More</button>
   </section>
 
   <section id="nav-projects">
     <h2>Projects</h2>
+    <!-- Add this search container -->
+    <div class="search-filter-container">
+      <div class="search-box">
+        <input type="text" id="projectSearch" placeholder="Search projects by name, industry, or skills..." />
+        <button id="clearProjectSearch">✕</button>
+      </div>
+    </div>
     <button onclick="fetchProjects()" class="btn visual">Show Projects</button>
     <div id="projects" class="card-list"></div>
+    <button id="showMoreProjects" class="show-more-btn" style="display:none;">Show More</button>
   </section>
 
   <section id="nav-resume">
