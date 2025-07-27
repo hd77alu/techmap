@@ -1,6 +1,21 @@
+// API Base URL for different environments
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : window.location.origin;
+
 // Helper to handle fetch with credentials
-function apiFetch(url, options = {}) {
-    return fetch(url, { credentials: 'include', ...options })
+function apiFetch(endpoint, options = {}) {
+    // Construct full URL if endpoint is relative
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+    
+    const defaultOptions = {
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    return fetch(url, { ...defaultOptions, ...options })
         .then(res => {
             if (res.ok) return res.json();
             if (res.status === 401) {

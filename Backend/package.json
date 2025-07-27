@@ -1,11 +1,18 @@
 {
-  "name": "techmap",
+  "name": "techmap-backend",
   "version": "1.0.0",
+  "description": "Backend for Techmap - Personalized Career Readiness Platform",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "dev": "nodemon server.js",
     "init-db": "node models/initDb.js",
     "seed": "node seedDatabase.js",
     "setup": "npm run init-db && npm run seed"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "dependencies": {
     "body-parser": "^1.20.2",

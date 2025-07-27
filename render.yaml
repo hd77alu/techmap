@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: techmap
+    env: node
+    plan: free
+    buildCommand: npm run build && npm run setup
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        generateValue: true
+      - key: HOST
+        value: 0.0.0.0
+    # Auto-deploy on changes (if using GitHub)
+    autoDeploy: true

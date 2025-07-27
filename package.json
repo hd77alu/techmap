@@ -1,0 +1,26 @@
+{
+  "name": "techmap",
+  "version": "1.0.0",
+  "description": "Personalized Career Readiness Platform",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "build": "cd backend && npm install",
+    "setup": "cd backend && npm run setup",
+    "init-db": "cd backend && npm run init-db",
+    "seed": "cd backend && npm run seed"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "career",
+    "education",
+    "learning",
+    "skills",
+    "resume",
+    "assessment"
+  ],
+  "author": "The Blueprint Team",
+  "license": "MIT"
+}

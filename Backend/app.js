@@ -6,12 +6,33 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const app = express();
-app.use(cors({ origin: true, credentials: true }));
+
+// CORS configuration for production
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL || true 
+    : true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(
-  session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: true })
-);
+
+// Session configuration for production
+app.use(session({ 
+  secret: process.env.SESSION_SECRET || 'fallback-secret-key',
+  resave: false, 
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/auth', require('./routes/authRoutes'));
