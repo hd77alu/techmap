@@ -61,10 +61,32 @@ exports.analyze = async (req, res) => {
         let totalMarketScore = 0;
         let marketableSkillsCount = 0;
 
-        // Analyze against trending data
+        // Analyze against trending data with enhanced matching
         trendingData.forEach(trend => {
             const trendName = (trend.item_name || trend.category || '').toLowerCase();
-            if (trendName && resumeText.includes(trendName)) {
+            let isMatch = false;
+            
+            // Special handling for combined skills
+            if (trendName === 'html/css') {
+                const hasHTML = resumeText.includes('html');
+                const hasCSS = resumeText.includes('css');
+                isMatch = hasHTML && hasCSS;
+            } else if (trendName === 'reading/writing') {
+                const hasReading = resumeText.includes('reading');
+                const hasWriting = resumeText.includes('writing');
+                isMatch = hasReading || hasWriting; // Either one counts
+            } else if (trendName && trendName.includes('/')) {
+                // Handle other slash-separated skills
+                const parts = trendName.split('/');
+                isMatch = parts.some(part => 
+                    resumeText.includes(part.trim())
+                );
+            } else if (trendName) {
+                // Regular matching for single skills
+                isMatch = resumeText.includes(trendName);
+            }
+            
+            if (isMatch) {
                 detectedSkills.push({
                     skill: trend.item_name || trend.category,
                     category: trend.category,
@@ -230,7 +252,29 @@ function analyzeSkillGaps(detectedSkills, trendingData) {
     return trendingData
         .filter(trend => {
             const trendName = (trend.item_name || trend.category || '').toLowerCase();
-            return trendName && !detectedSkillNames.includes(trendName) && trend.trend_score > 30;
+            
+            // Skip if trend name is empty or score too low
+            if (!trendName || trend.trend_score <= 30) {
+                return false;
+            }
+            
+            // Check if this skill is already detected
+            // Handle combined skills properly
+            if (trendName === 'html/css') {
+                // Check if HTML/CSS is already in detected skills
+                return !detectedSkillNames.some(detected => 
+                    detected === 'html/css' || 
+                    (detectedSkillNames.includes('html') && detectedSkillNames.includes('css'))
+                );
+            } else if (trendName.includes('/')) {
+                // For other combined skills, check if any part is detected
+                const parts = trendName.split('/').map(part => part.trim());
+                const hasAnyPart = parts.some(part => detectedSkillNames.includes(part));
+                return !hasAnyPart && !detectedSkillNames.includes(trendName);
+            } else {
+                // Regular single skill check
+                return !detectedSkillNames.includes(trendName);
+            }
         })
         .map(trend => ({
             skill: trend.item_name || trend.category,
