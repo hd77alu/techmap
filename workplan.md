@@ -29,7 +29,7 @@
 5. **Initialize and seed the database**
 
    ```bash
-   node models/initDb.js 
+   npm run setup
    ```
 
 6. **Start the server**
@@ -39,7 +39,7 @@
    ```
 
 7. **Open the url**
-   The backend serves static files from `../frontend`. Open your browser at `http://localhost:3000`.
+ Open your browser at `http://localhost:3000`.
 
 ---
 

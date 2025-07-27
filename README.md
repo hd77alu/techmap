@@ -21,6 +21,9 @@ Techmap is a responsive web application designed to empower Software Engineering
 * **Trends Dashboard**
   Simple bar and pie charts displaying trending programming languages, frameworks, and job roles sourced from pre-curated JSON data.
 
+* **Visual Board**
+  A board to Visualize and track your tech career goals.
+
 * **Basic Resume Analysis**
   Keyword-based parsing of pasted or uploaded CV text to suggest relevant projects or skills directly from the project database.
 
@@ -81,7 +84,7 @@ Techmap is a responsive web application designed to empower Software Engineering
    ```
 
 6. **Serve the frontend**
-   The backend serves static files from `../frontend`. Open your browser at `http://localhost:3000`.
+   Open your browser at `http://localhost:3000`.
 
 ---
 
@@ -138,4 +141,4 @@ See `backend/models/init.sql` for full details. Key tables:
 
 ---
 
-*Crafted with ❤ by The Blueprint Team.*
+*Crafted by The Blueprint Team.*
