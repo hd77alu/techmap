@@ -1,14 +1,8 @@
-const router = require('express').Router();
-const { ensureAuth } = require('../middleware/authMiddleware');
-const Project = require('../models/projectModel');
+const express = require('express');
+const { getProjects, getProjectFilters } = require('../controllers/projectController');
+const router = express.Router();
 
-router.get('/', ensureAuth, async (req, res) => {
-  try {
-    const data = await Project.getAll();
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router.get('/', getProjects);
+router.get('/filters', getProjectFilters);
 
 module.exports = router;
