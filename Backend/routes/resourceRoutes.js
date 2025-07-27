@@ -1,6 +1,8 @@
-const router = require('express').Router();
-const { ensureAuth } = require('../middleware/authMiddleware');
-const { getResources } = require('../controllers/resourceController');
+const express = require('express');
+const { getResources, getResourceFilters } = require('../controllers/resourceController');
+const router = express.Router();
 
-router.get('/', ensureAuth, getResources);
+router.get('/', getResources);
+router.get('/filters', getResourceFilters);
+
 module.exports = router;
