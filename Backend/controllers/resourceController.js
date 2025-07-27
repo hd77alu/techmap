@@ -12,16 +12,16 @@ function getResources(req, res) {
     let filters = '';
     let params = [];
 
-    // Learning style filter
+    // Learning style filter - Fixed column name
     if (style) {
         filters += ' AND recommended_style LIKE ?';
         params.push(`%${style}%`);
     }
 
-    // Search functionality
+    // Search functionality - enhanced to search description as well
     if (search) {
-        filters += ' AND (name LIKE ? OR type LIKE ? OR tech_tags LIKE ?)';
-        params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+        filters += ' AND (name LIKE ? OR description LIKE ? OR type LIKE ? OR tech_tags LIKE ?)';
+        params.push(`%${search}%`, `%${search}%`, `%${search}%`, `%${search}%`);
     }
 
     // Type filter
@@ -41,8 +41,7 @@ function getResources(req, res) {
         if (err) {
             console.error('Database error:', err);
             return res.status(500).json({ error: 'Database error' });
-        }
-        // Process comma-separated values
+        }        // Process comma-separated values
         const processedRows = rows.map(row => ({
             ...row,
             recommended_styles: row.recommended_style ? row.recommended_style.split(',').map(s => s.trim()) : [],
@@ -56,7 +55,10 @@ function getResources(req, res) {
             }
             res.json({
                 data: processedRows,
-                total: countRow.total
+                total: countRow.total,
+                limit: Number(limit),
+                offset: Number(offset),
+                hasMore: processedRows.length === Number(limit)
             });
         });
     });

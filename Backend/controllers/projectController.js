@@ -36,12 +36,14 @@ function getProjects(req, res) {
             console.error('Database error:', err);
             return res.status(500).json({ error: 'Database error' });
         }
-        // Process comma-separated values
+        
+        // Process comma-separated values for better frontend consumption
         const processedRows = rows.map(row => ({
             ...row,
             required_skills_array: row.required_skills ? row.required_skills.split(',').map(s => s.trim()) : []
         }));
-        // Get total count for current filters
+
+        // Get total count for pagination
         db.get(countQuery, params, (countErr, countRow) => {
             if (countErr) {
                 console.error('Database error:', countErr);
@@ -49,7 +51,10 @@ function getProjects(req, res) {
             }
             res.json({
                 data: processedRows,
-                total: countRow.total
+                total: countRow.total,
+                limit: Number(limit),
+                offset: Number(offset),
+                hasMore: processedRows.length === Number(limit)
             });
         });
     });

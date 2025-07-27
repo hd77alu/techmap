@@ -84,21 +84,144 @@
 
   <section id="nav-resources">
     <h2>Resources</h2>
+    
+    <!-- Search and Filter Container -->
+    <div class="search-filter-container">
+      <div class="search-box">
+        <input type="text" id="resourceSearch" placeholder="Search resources by name, type, or tech tags..." />
+        <button id="clearResourceSearch" class="clear-btn">✕</button>
+      </div>
+      
+      <div class="results-info hidden" id="resourcesInfo">
+        <span class="results-count"></span>
+      </div>
+    </div>
+    
+    <!-- Learning Style Buttons -->
     <div class="btn-group"></div>
+    
+    <!-- Resources List -->
     <div id="resources" class="card-list"></div>
+    
+    <!-- Show More Button -->
+    <button id="showMoreResources" class="show-more-btn hidden">Show More</button>
   </section>
 
   <section id="nav-projects">
     <h2>Projects</h2>
-    <button onclick="fetchProjects()" class="btn visual">Show Projects</button>
+    
+    <!-- Search Container -->
+    <div class="search-filter-container">
+      <div class="search-box">
+        <input type="text" id="projectSearch" placeholder="Search projects by name, industry, or skills..." />
+        <button id="clearProjectSearch" class="clear-btn">✕</button>
+      </div>
+      
+      <div class="results-info hidden" id="projectsInfo">
+        <span class="results-count"></span>
+      </div>
+    </div>
+    
+    <!-- Show Projects Button -->
+    <button onclick="loadInitialProjects()" class="btn visual">Show Projects</button>
+    
+    <!-- Projects List -->
     <div id="projects" class="card-list"></div>
+    
+    <!-- Show More Button -->
+    <button id="showMoreProjects" class="show-more-btn hidden">Show More</button>
   </section>
 
   <section id="nav-resume">
     <h2>Resume Analysis</h2>
-    <textarea id="resumeText" placeholder="Paste your resume here..."></textarea>
-    <button onclick="analyzeResume()" class="btn kinesthetic">Analyze Resume</button>
-    <pre id="resumeResult"></pre>
+    
+    <!-- Resume Input Section -->
+    <div class="resume-input-container">
+      <div class="input-instructions">
+        <h3>📄 Paste Your Resume Text</h3>
+        <p>Copy and paste your resume content below to get intelligent analysis based on current market trends.</p>
+      </div>
+      
+      <textarea id="resumeText" placeholder="Paste your resume text here..."></textarea>
+      
+      <div class="analysis-controls">
+        <button onclick="analyzeResume()" class="btn analysis-btn">
+          <span class="btn-icon">🔍</span>
+          Analyze Resume
+        </button>
+      </div>
+    </div>
+    
+    <!-- Loading State -->
+    <div id="resumeLoading" class="resume-loading hidden">
+      <div class="loading-spinner"></div>
+      <p>Analyzing your resume against current market trends...</p>
+    </div>
+    
+    <!-- Results Container -->
+    <div id="resumeResults" class="resume-results hidden">
+      
+      <!-- Summary Section -->
+      <div class="analysis-summary">
+        <h3>📊 Analysis Summary</h3>
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-number" id="skillsCount">0</div>
+            <div class="summary-label">Skills Detected</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-number" id="marketAlignment">0%</div>
+            <div class="summary-label">Market Alignment</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-text" id="topCategory">-</div>
+            <div class="summary-label">Top Category</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Detected Skills Section -->
+      <div class="analysis-section">
+        <h3>🎯 Your Skills & Market Demand</h3>
+        <div id="detectedSkills" class="skills-grid"></div>
+      </div>
+      
+      <!-- Project Recommendations Section -->
+      <div class="analysis-section">
+        <h3>🚀 Recommended Projects</h3>
+        <p class="section-description">Projects that match your skillset and align with market trends</p>
+        <div id="projectRecommendations" class="projects-grid"></div>
+      </div>
+      
+      <!-- Skill Gaps Section -->
+      <div class="analysis-section">
+        <h3>📈 Skill Gaps & Opportunities</h3>
+        <p class="section-description">High-demand skills missing from your resume</p>
+        <div id="skillGaps" class="gaps-grid"></div>
+      </div>
+      
+      <!-- Learning Recommendations Section -->
+      <div class="analysis-section">
+        <h3>🎓 Learning Recommendations</h3>
+        <p class="section-description">Prioritized learning path to improve your market position</p>
+        <div id="learningRecommendations" class="learning-grid"></div>
+      </div>
+      
+      <!-- Insights Section -->
+      <div class="analysis-section">
+        <h3>💡 Insights & Recommendations</h3>
+        <div id="insights" class="insights-container"></div>
+      </div>
+      
+    </div>
+    
+    <!-- Error State -->
+    <div id="resumeError" class="resume-error hidden">
+      <div class="error-icon">⚠️</div>
+      <div class="error-message"></div>
+      <button onclick="retryAnalysis()" class="btn retry-btn">Try Again</button>
+    </div>
+    
   </section>
 
   <!-- Scroll to Top Button -->
@@ -107,5 +230,16 @@
       <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
     </svg>
   </button>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <span>&copy; 2025</span>
+      <span class="footer-divider">•</span>
+      <span class="copyright">The Blueprint Team</span>
+      <span class="footer-divider">•</span>
+      <span>All rights reserved</span>
+    </div>
+  </footer>
 </body>
 </html>

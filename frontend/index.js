@@ -346,7 +346,9 @@ window.selectLearningStyle = selectLearningStyle;
 // Resources
 function fetchResources(style) {
     apiFetch(`/api/resources?style=${encodeURIComponent(style)}`)
-        .then(data => {
+        .then(response => {
+            // Handle the new API response format {data: [...], total: number}
+            const data = response.data || response;
             if (Array.isArray(data) && data.length) {
                 document.getElementById('resources').innerHTML = data.map(resource => {
                     let links = '';
@@ -373,7 +375,9 @@ window.fetchResources = fetchResources;
 // Projects
 function fetchProjects() {
     apiFetch('/api/projects')
-        .then(data => {
+        .then(response => {
+            // Handle the new API response format {data: [...], total: number}
+            const data = response.data || response;
             if (Array.isArray(data) && data.length) {
                 document.getElementById('projects').innerHTML = data.map(project => {
                     let links = '';
@@ -610,18 +614,277 @@ function fetchTrends() {
 }
 window.fetchTrends = fetchTrends;
 
-// Resume Analysis
+// Enhanced Resume Analysis
 function analyzeResume() {
-    const text = document.getElementById('resumeText').value;
+    const text = document.getElementById('resumeText').value.trim();
+    
+    // Validate input
+    if (!text) {
+        showResumeError('Please paste your resume text before analyzing.');
+        return;
+    }
+    
+    if (text.length < 100) {
+        showResumeError('Resume text seems too short. Please provide more detailed content.');
+        return;
+    }
+    
+    if (text.length > 50000) {
+        showResumeError('Resume text is too long. Please keep it under 50,000 characters.');
+        return;
+    }
+    
+    // Show loading state
+    showResumeLoading();
+    
+    // Make API request
     apiFetch('/api/resume', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text })
     })
-        .then(data => document.getElementById('resumeResult').textContent = JSON.stringify(data, null, 2))
-        .catch(() => document.getElementById('resumeResult').textContent = 'Error analyzing resume');
+    .then(data => {
+        hideResumeLoading();
+        displayResumeAnalysis(data);
+    })
+    .catch(error => {
+        hideResumeLoading();
+        console.error('Resume analysis error:', error);
+        
+        // Handle specific error cases
+        if (error.status === 401) {
+            showResumeError('Please log in to use the resume analysis feature.');
+        } else if (error.status === 400) {
+            showResumeError('Invalid resume data. Please check your input and try again.');
+        } else if (error.status === 500) {
+            showResumeError('Server error occurred. Please try again later.');
+        } else {
+            showResumeError('Analysis failed. Please check your connection and try again.');
+        }
+    });
 }
+
+function retryAnalysis() {
+    hideResumeError();
+    analyzeResume();
+}
+
+function showResumeLoading() {
+    document.getElementById('resumeLoading').classList.remove('hidden');
+    hideResumeResults();
+    hideResumeError();
+}
+
+function hideResumeLoading() {
+    document.getElementById('resumeLoading').classList.add('hidden');
+}
+
+function showResumeError(message) {
+    const errorContainer = document.getElementById('resumeError');
+    const errorMessage = errorContainer.querySelector('.error-message');
+    errorMessage.textContent = message;
+    errorContainer.classList.remove('hidden');
+    hideResumeResults();
+    hideResumeLoading();
+}
+
+function hideResumeError() {
+    document.getElementById('resumeError').classList.add('hidden');
+}
+
+function hideResumeResults() {
+    document.getElementById('resumeResults').classList.add('hidden');
+}
+
+function displayResumeAnalysis(data) {
+    // Show results container
+    document.getElementById('resumeResults').classList.remove('hidden');
+    
+    // Update summary
+    updateAnalysisSummary(data.summary);
+    
+    // Display detected skills
+    displayDetectedSkills(data.detectedSkills);
+    
+    // Display project recommendations
+    displayProjectRecommendations(data.projectRecommendations);
+    
+    // Display skill gaps
+    displaySkillGaps(data.skillGaps);
+    
+    // Display learning recommendations
+    displayLearningRecommendations(data.learningRecommendations);
+    
+    // Display insights
+    displayInsights(data.insights);
+    
+    // Scroll to results
+    document.getElementById('resumeResults').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+    });
+}
+
+function updateAnalysisSummary(summary) {
+    document.getElementById('skillsCount').textContent = summary.totalSkillsDetected;
+    document.getElementById('marketAlignment').textContent = `${summary.marketAlignmentPercentage}%`;
+    document.getElementById('topCategory').textContent = summary.topCategory || 'General';
+    
+    // Add visual indicators based on alignment percentage
+    const alignmentElement = document.getElementById('marketAlignment');
+    alignmentElement.className = 'summary-number';
+    
+    if (summary.marketAlignmentPercentage >= 70) {
+        alignmentElement.classList.add('high-alignment');
+    } else if (summary.marketAlignmentPercentage >= 40) {
+        alignmentElement.classList.add('medium-alignment');
+    } else {
+        alignmentElement.classList.add('low-alignment');
+    }
+}
+
+function displayDetectedSkills(skills) {
+    const container = document.getElementById('detectedSkills');
+    
+    if (!skills || skills.length === 0) {
+        container.innerHTML = '<p class="no-data">No marketable skills detected. Consider adding more technical skills to your resume.</p>';
+        return;
+    }
+    
+    container.innerHTML = skills.map(skill => `
+        <div class="skill-card">
+            <div class="skill-header">
+                <h4 class="skill-name">${skill.skill}</h4>
+                <span class="skill-category">${skill.category}</span>
+            </div>
+            <div class="skill-metrics">
+                <div class="market-score">
+                    <span class="score-value">${skill.marketScore}%</span>
+                    <span class="score-label">Market Usage</span>
+                </div>
+                <div class="demand-level ${skill.demand.toLowerCase().replace(/[\/\s]/g, '-')}">
+                    ${skill.demand} Demand
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function displayProjectRecommendations(projects) {
+    const container = document.getElementById('projectRecommendations');
+    
+    if (!projects || projects.length === 0) {
+        container.innerHTML = '<p class="no-data">No project recommendations available. Add more skills to get personalized suggestions.</p>';
+        return;
+    }
+    
+    container.innerHTML = projects.map(project => `
+        <div class="project-recommendation-card">
+            <div class="project-header">
+                <h4 class="project-name">${project.name}</h4>
+                <div class="relevance-score">
+                    <span class="score">${project.relevanceScore}%</span>
+                    <span class="label">Match</span>
+                </div>
+            </div>
+            <p class="project-description">${project.description || 'No description available'}</p>
+            <div class="project-meta">
+                <span class="project-industry">
+                    <strong>Industry:</strong> ${project.industry || 'General'}
+                </span>
+                <span class="matching-skills">
+                    <strong>Matching Skills:</strong> ${project.matchingSkills.join(', ')}
+                </span>
+            </div>
+            <div class="project-reason">${project.recommendationReason}</div>
+            ${project.url ? `<a href="${project.url}" target="_blank" class="project-link">View Project</a>` : ''}
+        </div>
+    `).join('');
+}
+
+function displaySkillGaps(gaps) {
+    const container = document.getElementById('skillGaps');
+    
+    if (!gaps || gaps.length === 0) {
+        container.innerHTML = '<p class="no-data">Great! Your skills are well-aligned with current market trends.</p>';
+        return;
+    }
+    
+    container.innerHTML = gaps.map(gap => `
+        <div class="gap-card">
+            <div class="gap-header">
+                <h4 class="gap-skill">${gap.skill}</h4>
+                <div class="gap-priority priority-${gap.priority.toLowerCase()}">
+                    ${gap.priority} Priority
+                </div>
+            </div>
+            <div class="gap-metrics">
+                <span class="gap-category">${gap.category}</span>
+                <span class="gap-demand">${gap.demand} Demand</span>
+                <span class="gap-score">${gap.marketScore}% Usage</span>
+            </div>
+            <p class="gap-reason">${gap.reason}</p>
+        </div>
+    `).join('');
+}
+
+function displayLearningRecommendations(recommendations) {
+    const container = document.getElementById('learningRecommendations');
+    
+    if (!recommendations || recommendations.length === 0) {
+        container.innerHTML = '<p class="no-data">Focus on strengthening your existing skills and exploring adjacent technologies.</p>';
+        return;
+    }
+    
+    container.innerHTML = recommendations.map(rec => `
+        <div class="learning-card">
+            <div class="learning-header">
+                <h4 class="learning-skill">${rec.skill}</h4>
+                <div class="learning-priority priority-${rec.priority.toLowerCase()}">
+                    ${rec.priority} Priority
+                </div>
+            </div>
+            <div class="learning-meta">
+                <span class="learning-category">${rec.category}</span>
+                <span class="learning-time">${rec.estimatedTime}</span>
+                <span class="learning-score">${rec.marketScore}% Market Usage</span>
+            </div>
+            <div class="learning-path">
+                <strong>Learning Path:</strong>
+                <p>${rec.learningPath}</p>
+            </div>
+            <div class="learning-resources">
+                <strong>Recommended Resources:</strong>
+                <ul>
+                    ${rec.resources.map(resource => `<li>${resource}</li>`).join('')}
+                </ul>
+            </div>
+        </div>
+    `).join('');
+}
+
+function displayInsights(insights) {
+    const container = document.getElementById('insights');
+    
+    if (!insights || insights.length === 0) {
+        container.innerHTML = '<p class="no-data">No specific insights available at this time.</p>';
+        return;
+    }
+    
+    container.innerHTML = insights.map(insight => `
+        <div class="insight-card insight-${insight.type}">
+            <div class="insight-header">
+                <h4 class="insight-title">${insight.title}</h4>
+                <span class="insight-type-badge ${insight.type}">${insight.type}</span>
+            </div>
+            <p class="insight-message">${insight.message}</p>
+        </div>
+    `).join('');
+}
+
+// Make function globally available
 window.analyzeResume = analyzeResume;
+window.retryAnalysis = retryAnalysis;
 
 // Vision Board access
 document.addEventListener('DOMContentLoaded', () => {
@@ -633,88 +896,366 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Scroll to Top Button Functionality with Overflow Fix
+    // Simplified Scroll to Top Button Functionality
     const scrollToTopBtn = document.getElementById('scrollToTop');
-    let isScrolling = false;
-    let scrollTimeout;
     
     if (scrollToTopBtn) {
-        // Show/hide button based on scroll position with debouncing
+        // Show/hide button based on scroll position
+        let scrollTimeout;
+        
         const handleScroll = () => {
-            if (!isScrolling) {
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                if (scrollTop > 200) {
-                    scrollToTopBtn.classList.add('visible');
-                } else {
-                    scrollToTopBtn.classList.remove('visible');
-                }
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > 200) {
+                scrollToTopBtn.classList.add('visible');
+            } else {
+                scrollToTopBtn.classList.remove('visible');
             }
         };
 
-        // Debounced scroll listener for better performance
+        // Throttled scroll listener for better performance
         window.addEventListener('scroll', () => {
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(handleScroll, 10);
+            if (!scrollTimeout) {
+                scrollTimeout = setTimeout(() => {
+                    handleScroll();
+                    scrollTimeout = null;
+                }, 16); // ~60fps
+            }
         });
 
-        // Enhanced smooth scroll to top with overflow prevention
+        // Simple scroll to top using native browser smooth scrolling
         scrollToTopBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            e.stopPropagation();
             
-            if (isScrolling) return; // Prevent multiple clicks
-            
-            isScrolling = true;
-            
-            // Temporarily disable CSS smooth scrolling to prevent conflicts
-            document.documentElement.style.scrollBehavior = 'auto';
-            
-            // Add visual feedback
-            scrollToTopBtn.style.transform = 'translateY(-1px) scale(0.95)';
-            scrollToTopBtn.classList.remove('visible'); // Hide immediately to prevent flicker
-            
-            // Custom smooth scroll implementation to avoid overflow
-            const startTime = performance.now();
-            const startPosition = window.pageYOffset;
-            const duration = 800; // Shorter duration for better control
-            
-            const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
-            
-            const scrollAnimation = (currentTime) => {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeProgress = easeOutCubic(progress);
-                
-                const currentPosition = startPosition * (1 - easeProgress);
-                window.scrollTo(0, currentPosition);
-                
-                if (progress < 1) {
-                    requestAnimationFrame(scrollAnimation);
-                } else {
-                    // Animation complete
-                    window.scrollTo(0, 0); // Ensure we're exactly at top
-                    
-                    // Re-enable CSS smooth scrolling
-                    document.documentElement.style.scrollBehavior = '';
-                    
-                    // Reset visual feedback
-                    setTimeout(() => {
-                        scrollToTopBtn.style.transform = '';
-                    }, 100);
-                    
-                    // Reset scrolling flag after a delay
-                    setTimeout(() => {
-                        isScrolling = false;
-                        // Check if button should be visible (it shouldn't be at top)
-                        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-                        if (currentScroll <= 200) {
-                            scrollToTopBtn.classList.remove('visible');
-                        }
-                    }, 200);
-                }
-            };
-            
-            requestAnimationFrame(scrollAnimation);
+            // Let the browser handle smooth scrolling natively
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         });
     }
+
+    // Initialize search functionality
+    setupSearch();
 });
+
+// Enhanced Search and Pagination State Management
+let resourcesState = {
+    currentPage: 0,
+    limit: 10,
+    searchTerm: '',
+    selectedStyle: '',
+    loading: false,
+    hasMore: true
+};
+
+let projectsState = {
+    currentPage: 0,
+    limit: 10,
+    searchTerm: '',
+    loading: false,
+    hasMore: true
+};
+
+// Enhanced fetchResources with search and pagination
+function enhancedFetchResources(style = '', reset = true, searchTerm = '') {
+    if (resourcesState.loading) return;
+    
+    resourcesState.loading = true;
+    
+    if (reset) {
+        resourcesState.currentPage = 0;
+        resourcesState.selectedStyle = style;
+        resourcesState.searchTerm = searchTerm;
+        document.getElementById('resources').innerHTML = '';
+    }
+
+    const params = new URLSearchParams({
+        style: resourcesState.selectedStyle,
+        search: resourcesState.searchTerm,
+        limit: resourcesState.limit,
+        offset: resourcesState.currentPage * resourcesState.limit
+    });
+
+    // Show loading state
+    if (reset) {
+        document.getElementById('resources').innerHTML = '<div class="loading">Loading resources...</div>';
+    }
+
+    apiFetch(`/api/resources?${params}`)
+        .then(response => {
+            const data = response.data || response;
+            const total = response.total || data.length;
+            
+            // Update results info
+            updateResultsInfo('resourcesInfo', data.length, total, resourcesState.searchTerm, 'resources');
+            
+            if (Array.isArray(data) && data.length) {
+                const resourcesHTML = data.map(resource => {
+                    let links = '';
+                    if (resource.link) {
+                        links += `<a href="${resource.link}" target="_blank" class="resource-link">Resource Link</a> `;
+                    }
+                    if (resource.url) {
+                        links += `<a href="${resource.url}" target="_blank" class="resource-link">More Info</a>`;
+                    }
+                    
+                    const description = resource.description || '';
+                    const techTags = resource.tech_tags || '';
+                    const recommendedStyle = resource.recommended_style || '';
+                    
+                    return `<div class="card resource-card">
+                        <h3>${resource.title || resource.name}</h3>
+                        <p class="resource-description">${description}</p>
+                        <div class="resource-meta">
+                            <span class="resource-type">${resource.type || 'Resource'}</span>
+                            ${recommendedStyle ? `<span class="learning-style-tag ${recommendedStyle.toLowerCase().replace('/', '-')}">${recommendedStyle}</span>` : ''}
+                        </div>
+                        ${techTags ? `<div class="resource-tags"><strong>Tags:</strong> ${techTags}</div>` : ''}
+                        <div class="resource-links">${links}</div>
+                    </div>`;
+                }).join('');
+
+                if (reset) {
+                    document.getElementById('resources').innerHTML = resourcesHTML;
+                } else {
+                    document.getElementById('resources').innerHTML += resourcesHTML;
+                }
+                
+                // Update pagination state
+                resourcesState.currentPage++;
+                resourcesState.hasMore = data.length === resourcesState.limit;
+                
+                // Show/hide "Show More" button
+                const showMoreBtn = document.getElementById('showMoreResources');
+                if (showMoreBtn) {
+                    if (resourcesState.hasMore) {
+                        showMoreBtn.classList.remove('hidden');
+                    } else {
+                        showMoreBtn.classList.add('hidden');
+                    }
+                }
+                
+            } else {
+                if (reset) {
+                    document.getElementById('resources').innerHTML = '<div class="no-results">No resources found.</div>';
+                }
+                resourcesState.hasMore = false;
+                const showMoreBtn = document.getElementById('showMoreResources');
+                if (showMoreBtn) showMoreBtn.classList.add('hidden');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching resources:', error);
+            document.getElementById('resources').innerHTML = '<div class="error">Error fetching resources</div>';
+        })
+        .finally(() => {
+            resourcesState.loading = false;
+        });
+}
+
+// Enhanced fetchProjects with search and pagination
+function enhancedFetchProjects(reset = true, searchTerm = '') {
+    if (projectsState.loading) return;
+    
+    projectsState.loading = true;
+    
+    if (reset) {
+        projectsState.currentPage = 0;
+        projectsState.searchTerm = searchTerm;
+        document.getElementById('projects').innerHTML = '';
+    }
+
+    const params = new URLSearchParams({
+        search: projectsState.searchTerm,
+        limit: projectsState.limit,
+        offset: projectsState.currentPage * projectsState.limit
+    });
+
+    // Show loading state
+    if (reset) {
+        document.getElementById('projects').innerHTML = '<div class="loading">Loading projects...</div>';
+    }
+
+    apiFetch(`/api/projects?${params}`)
+        .then(response => {
+            const data = response.data || response;
+            const total = response.total || data.length;
+            
+            // Update results info
+            updateResultsInfo('projectsInfo', data.length, total, projectsState.searchTerm, 'projects');
+            
+            if (Array.isArray(data) && data.length) {
+                const projectsHTML = data.map(project => {
+                    let links = '';
+                    if (project.github) {
+                        links += `<a href="${project.github}" target="_blank" class="project-link">GitHub</a> `;
+                    }
+                    if (project.url) {
+                        links += `<a href="${project.url}" target="_blank" class="project-link">Project Link</a>`;
+                    }
+                    
+                    const description = project.description || '';
+                    const industry = project.industry || project.domain || project.category || 'N/A';
+                    const skills = project.required_skills || 'N/A';
+                    
+                    return `<div class="card project-card">
+                        <h3>${project.title || project.name}</h3>
+                        <p class="project-description">${description}</p>
+                        <div class="project-meta">
+                            <span class="project-industry"><strong>Industry:</strong> ${industry}</span>
+                            ${project.difficulty ? `<span class="project-difficulty"><strong>Difficulty:</strong> ${project.difficulty}</span>` : ''}
+                        </div>
+                        <div class="project-skills">
+                            <strong>Required Skills:</strong> ${skills}
+                        </div>
+                        <div class="project-links">${links}</div>
+                    </div>`;
+                }).join('');
+
+                if (reset) {
+                    document.getElementById('projects').innerHTML = projectsHTML;
+                } else {
+                    document.getElementById('projects').innerHTML += projectsHTML;
+                }
+                
+                // Update pagination state
+                projectsState.currentPage++;
+                projectsState.hasMore = data.length === projectsState.limit;
+                
+                // Show/hide "Show More" button
+                const showMoreBtn = document.getElementById('showMoreProjects');
+                if (showMoreBtn) {
+                    if (projectsState.hasMore) {
+                        showMoreBtn.classList.remove('hidden');
+                    } else {
+                        showMoreBtn.classList.add('hidden');
+                    }
+                }
+                
+            } else {
+                if (reset) {
+                    document.getElementById('projects').innerHTML = '<div class="no-results">No projects found.</div>';
+                }
+                projectsState.hasMore = false;
+                const showMoreBtn = document.getElementById('showMoreProjects');
+                if (showMoreBtn) showMoreBtn.classList.add('hidden');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching projects:', error);
+            document.getElementById('projects').innerHTML = '<div class="error">Error fetching projects</div>';
+        })
+        .finally(() => {
+            projectsState.loading = false;
+        });
+}
+
+// Results info display function
+function updateResultsInfo(containerId, currentCount, total, searchTerm, type) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    const resultsCount = container.querySelector('.results-count');
+    if (!resultsCount) return;
+    
+    let message = '';
+    if (searchTerm) {
+        message = `Found ${total} ${type} matching "${searchTerm}"`;
+    } else {
+        message = `Showing ${currentCount} of ${total} ${type}`;
+    }
+    
+    resultsCount.textContent = message;
+    if (total > 0) {
+        container.classList.remove('hidden');
+    } else {
+        container.classList.add('hidden');
+    }
+}
+
+// Real-time search with debouncing
+function setupSearch() {
+    let resourceSearchTimeout;
+    let projectSearchTimeout;
+    
+    // Resources search
+    const resourceSearch = document.getElementById('resourceSearch');
+    if (resourceSearch) {
+        resourceSearch.addEventListener('input', (e) => {
+            clearTimeout(resourceSearchTimeout);
+            resourceSearchTimeout = setTimeout(() => {
+                enhancedFetchResources(resourcesState.selectedStyle, true, e.target.value);
+            }, 300);
+        });
+    }
+    
+    // Projects search
+    const projectSearch = document.getElementById('projectSearch');
+    if (projectSearch) {
+        projectSearch.addEventListener('input', (e) => {
+            clearTimeout(projectSearchTimeout);
+            projectSearchTimeout = setTimeout(() => {
+                enhancedFetchProjects(true, e.target.value);
+            }, 300);
+        });
+    }
+    
+    // Clear buttons
+    const clearResourceSearch = document.getElementById('clearResourceSearch');
+    if (clearResourceSearch) {
+        clearResourceSearch.addEventListener('click', () => {
+            resourceSearch.value = '';
+            enhancedFetchResources(resourcesState.selectedStyle, true, '');
+        });
+    }
+    
+    const clearProjectSearch = document.getElementById('clearProjectSearch');
+    if (clearProjectSearch) {
+        clearProjectSearch.addEventListener('click', () => {
+            projectSearch.value = '';
+            enhancedFetchProjects(true, '');
+        });
+    }
+    
+    // Show More buttons
+    const showMoreResources = document.getElementById('showMoreResources');
+    if (showMoreResources) {
+        showMoreResources.addEventListener('click', () => {
+            enhancedFetchResources('', false);
+        });
+    }
+    
+    const showMoreProjects = document.getElementById('showMoreProjects');
+    if (showMoreProjects) {
+        showMoreProjects.addEventListener('click', () => {
+            enhancedFetchProjects(false);
+        });
+    }
+}
+
+// Enhanced selectLearningStyle to work with search
+function enhancedSelectLearningStyle(style) {
+    const styleMapping = {
+        'visual': 'Visual',
+        'auditory': 'Auditory', 
+        'kinesthetic': 'Kinesthetic',
+        'reading': 'Reading/Writing'
+    };
+    
+    const searchTerm = document.getElementById('resourceSearch')?.value || '';
+    enhancedFetchResources(styleMapping[style] || style, true, searchTerm);
+    updateLearningDescription(style);
+    updateButtonStates(style);
+}
+
+// Initial projects load function
+function loadInitialProjects() {
+    const searchTerm = document.getElementById('projectSearch')?.value || '';
+    enhancedFetchProjects(true, searchTerm);
+}
+
+// Override the existing functions with enhanced versions
+window.fetchResources = enhancedFetchResources;
+window.fetchProjects = enhancedFetchProjects;
+window.selectLearningStyle = enhancedSelectLearningStyle;
+window.loadInitialProjects = loadInitialProjects;
