@@ -1,0 +1,86 @@
+category,Item_name,trend_score
+Language,JavaScript,62.3
+Language,HTML/CSS,52.9
+Language,Python,51
+Language,SQL,51
+Language,TypeScript,38.5
+Language,Shell/Bash,33.9
+Language,Java,30.3
+Language,C#,27.1
+Language,C++,23
+Language,C,20.3
+Language,PHP,18.2
+Language,PowerShell,13.8
+Language,Go,13.5
+Language,Rust,12.6
+Language,Kotlin,9.4
+Framework,Node.js,40.8
+Framework,React,39.5
+Framework,Query,21.4
+Framework,Next.js,17.9
+Framework,Express,17.8
+Framework,Angular,17.1
+Framework,ASP.Net Core,16.9
+Framework,Vue.js,15.4
+Framework,ASP.NET,12.9
+Framework,Flask,12.9
+Database,PostgreSQL,48.7
+Database,MySQL,40.3
+Database,SQLite,33.1
+Database,Microsoft SQL Server,25.3
+Database,MongoDB,24.8
+Database,Redis,20
+Database,MariaDB,17.2
+Database,Elasticsearch,12.5
+Database,Oracle,10.1
+Database,Dynamodb,7.9
+Developer Tool,Docker,53.9
+Developer Tool,npm,49.6
+Developer Tool,Pip,32.4
+Developer Tool,Homebrew,22.3
+Developer Tool,Make,20.8
+Developer Tool,Vite,19.9
+Developer Tool,Kubernetes,19.4
+Developer Tool,Yarn,18.8
+Developer Tool,Webpack,18.4
+Developer Tool,NuGet,16.1
+Cloud Platform,Amazon Web Service(AWS),48
+Cloud Platform,Microsoft Azura,27.8
+Cloud Platform,Google Cloud,25.1
+Cloud Platform,Cloudflare,15.1
+Cloud Platform,Firebase,13.9
+Cloud Platform,Vercel,11.9
+Cloud Platform,Digital Ocean,11.7
+Cloud Platform,Heroku,8.2
+Cloud Platform,Netlify,7
+Cloud Platform,VMware,6.6
+Management Tool,Jira,51.4
+Management Tool,Confluence,31.6
+Management Tool,Markdown File,29.1
+Management Tool,Trello,19
+Management Tool,Notion,18.2
+Management Tool,Github discussion,17.9
+Management Tool,Azura Devops,16.3
+Management Tool,Miro,13.8
+Management Tool,Obsidian,13
+Management Tool,Wikis,7.6
+Job Role,AI Engineer,28
+Job Role,IT Security Engineer,16
+Job Role,Cyber Security Engineer,13
+Job Role,Data Analysis,8
+Job Role,Software Enginner,7
+Job Role,Cloud Engineer,4
+Job Role,Solution Architect,2
+Job Role,Backend Developer,2
+Job Role,Frontend Developer,2
+Job Role,Web Developer,2
+Job Role,Java Developer,2
+Job Role,Mobile app Developer,1
+Software Challenges,Security Threats,51
+Software Challenges,Ensuring the Quality\Reliability Of AI generated Code,45
+Software Challenges,Incorporating AI Software Into The Development Process,44
+Software Challenges,Ensuring Data Privacy,41
+Software Challenges,High Workload/ Not Enough Time To Get The Work done,24
+Software Challenges,Difficulty With Third Party Integration,21
+Software Challenges,Customer Expectations Were Too High/ Unclear Requirements,22
+Software Challenges,Trouble Keeping Legacy Software Current,20

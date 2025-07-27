@@ -47,25 +47,31 @@ Techmap is a responsive web application designed to empower Software Engineering
    cd techmap/backend
    ```
 
-2. **Initialize and seed the database**
+2. **Install backend dependencies**
 
    ```bash
-   node models/initDb.js 
+   npm install
    ```
 
-3. **Configure environment variables**
+3. **Initialize and seed the database**
+
+   ```bash
+   npm run setup
+   ```
+   
+   Or run individually:
+   ```bash
+   npm run init-db    # Create tables
+   npm run seed       # Seed CSV data
+   ```
+
+4. **Configure environment variables**
    Create a `.env` file in `backend/` with:
 
    ```env
    GOOGLE_CLIENT_ID=your_google_client_id
    GOOGLE_CLIENT_SECRET=your_google_client_secret
    SESSION_SECRET=your_session_secret
-   ```
-
-4. **Install backend dependencies**
-
-   ```bash
-   npm install
    ```
 
 5. **Start the server**

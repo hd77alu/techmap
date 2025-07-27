@@ -19,8 +19,11 @@ db.serialize(() => {
     CREATE TABLE IF NOT EXISTS learning_styles (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
-      style_type TEXT,
-      assessment_date TEXT,
+      visual REAL NOT NULL DEFAULT 0,
+      auditory REAL NOT NULL DEFAULT 0,
+      kinesthetic REAL NOT NULL DEFAULT 0,
+      reading REAL NOT NULL DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(user_id) REFERENCES users(id)
     )
   `);
@@ -56,7 +59,7 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
       description TEXT,
-      github_url TEXT,
+      url TEXT,
       industry TEXT,
       required_skills TEXT
     )
@@ -85,42 +88,5 @@ db.serialize(() => {
   `);
 
   console.log('✅ Tables created successfully!');
-
-  // SAMPLE DATA
-  db.run(`
-    INSERT OR IGNORE INTO users (google_id, username, email, last_login_date)
-    VALUES ('12345', 'Test User', 'testuser@example.com', datetime('now'))
-  `);
-
-  db.run(`
-    INSERT INTO learning_styles (user_id, style_type, assessment_date)
-    VALUES (1, 'Visual', datetime('now'))
-  `);
-
-  db.run(`
-    INSERT INTO resources (name, type, url, recommended_style, tech_tags)
-    VALUES 
-    ('JavaScript Crash Course', 'Video', 'https://youtube.com/jscrashcourse', 'Visual', 'JavaScript,Frontend'),
-    ('Python for Beginners', 'Course', 'https://coursera.org/python-course', 'Reading/Writing', 'Python'),
-    ('Data Structures Handbook', 'Article', 'https://ds-guide.com', 'Reading/Writing', 'Algorithms,Data Structures')
-  `);
-
-  db.run(`
-    INSERT INTO projects (name, description, github_url, industry, required_skills)
-    VALUES 
-    ('Health Tracker App', 'A simple web app to monitor heart rate and steps.', 'https://github.com/example/health-tracker', 'Healthcare', 'JavaScript,HTML,CSS'),
-    ('Stock Market Analyzer', 'Analyze stock trends using basic Python logic.', 'https://github.com/example/stock-analyzer', 'Finance', 'Python,Pandas,Matplotlib'),
-    ('Football Match Predictor', 'A web app that predicts outcomes of football games.', 'https://github.com/example/football-predictor', 'Sports', 'Python,Machine Learning,Flask')
-  `);
-
-  db.run(`
-    INSERT INTO trending_data (category, item_name, trend_score, update_date)
-    VALUES 
-    ('Language', 'Python', 95.6, '2025-07-01'),
-    ('Language', 'JavaScript', 93.4, '2025-07-01'),
-    ('Framework', 'React', 90.1, '2025-07-01'),
-    ('Job Role', 'Full-Stack Developer', 89.2, '2025-07-01')
-  `);
-
-  console.log('✅ Sample data inserted successfully!');
+  console.log('✅ Database initialization completed!');
 });

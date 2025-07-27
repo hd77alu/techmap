@@ -1,65 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Techmap</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script defer src="index.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Techmap</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="index.js"></script>
 </head>
 <body>
-<header class="header">
+  <header class="header">
     <div class="logo-container">
-        <img src="imgs/Vector - 0.svg" alt="Logo" class="logo" />
-        <h1>Techmap</h1>
+      <img src="imgs/Vector - 0.svg" alt="Logo" class="logo"/>
+      <h1>Techmap</h1>
     </div>
     <nav>
-        <ul>
-            <li><a href="#nav-style">Learning Styles</a></li>
-            <li><a href="#nav-resources">Resources</a></li>
-            <li><a href="#nav-projects">Projects</a></li>
-            <li><a href="#nav-trends">Trends</a></li>
-            <li><a href="#nav-resume">Resume Analysis</a></li>
-        </ul>
+      <ul>
+        <li><a href="#nav-style">Learning Styles</a></li>
+        <li><a href="#nav-resources">Resources</a></li>
+        <li><a href="#nav-projects">Projects</a></li>
+        <li><a href="#nav-trends">Trends</a></li>
+        <li><a href="#nav-resume">Resume Analysis</a></li>
+      </ul>
     </nav>
-</header>
-<div class="login-container">
-    <button id="loginBtn">Login with Google</button>
-    <button id="logoutBtn">Logout</button>
-</div>
-<section>
-    <h2 id="nav-profile">Profile</h2>
-    <div id="profile"></div>
-    <h3 id="nav-style">Your Preferred Learning Style</h2>
-    <button onclick="saveLearningStyle('Visual')">Visual</button>
-    <button onclick="saveLearningStyle('Auditory')">Auditory</button>
-    <button onclick="saveLearningStyle('Kinesthetic')">Kinesthetic</button>
-    <button onclick="saveLearningStyle('Reading/Writing')">Reading/Writing</button>
-</section> 
-<section>
-    <h2 id="nav-trends">Software industry insights</h2>
-    <button onclick="fetchTrends()">Show Trends</button>
-    <div id="trends" class="card-list"></div>
-    <canvas id="trendsChart" width="600" height="300"></canvas>
-</section>
-<section>
-    <h2 id="nav-resources">Resources</h2>
-    <button onclick="fetchResources('Visual')">Visual</button>
-    <button onclick="fetchResources('Auditory')">Auditory</button>
-    <button onclick="fetchResources('Kinesthetic')">Kinesthetic</button>
-    <button onclick="fetchResources('Reading/Writing')">Reading/Writing</button>
+  </header>
+
+  <div class="dashboard-header">
+    <div id="profile" class="welcome-box">Welcome!</div>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </div>
+
+  <section class="welcome-section">
+    <p class="intro-card">
+      Techmap is tailored for your needs, designed to optimize your learning journey, guide your skill development, and enhance your career readiness through data-driven insights.
+    </p>
+    
+    <div class="action-cards">
+      <div class="action-card">
+        <p class="intro-text">
+          <strong>Discover Your Learning Style:</strong> Take our comprehensive VARK assessment to understand how you learn best. 
+          Whether you're a visual, auditory, kinesthetic, or reading/writing learner, knowing your style will help you 
+          choose the most effective study methods tailored to your strengths.
+        </p>
+        <a href="quiz.html" class="quiz-btn">Take Learning Style Quiz</a>
+      </div>
+      
+      <div class="action-card">
+        <p class="intro-text">
+          <strong>Visualize Your Tech Journey:</strong> Create an inspiring vision board that maps out your technology career goals. 
+          Explore different tech domains, set milestones, and track your progress as you build the skills needed to achieve 
+          your dream role in the software industry.
+        </p>
+        <a href="visual-board.html" id="visionBoardBtn" class="quiz-btn">Go to The Vision Board</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="nav-style">
+    <h2>Your Learning Styles</h2>
+    <div id="styleResultsHeading" class="style-results-heading"></div>
+    <div id="styleResults" class="style-list"></div>
+    <div class="btn-group" id="styleBtnGroup"></div>
+    
+    <div id="learningDescription" class="learning-description">
+      <div class="description-content">
+        <p><strong>Visual Learners:</strong> Prefer to learn through visual aids such as diagrams, charts, maps, and videos. They benefit from seeing information presented in a visual format.</p>
+        
+        <p><strong>Auditory Learners:</strong> Learn best through listening and verbal instruction. They prefer spoken explanations, discussions, lectures, and audiobooks.</p>
+        
+        <p><strong>Kinesthetic/Tactile Learners:</strong> Learn by doing and engaging in hands-on activities. They prefer to physically manipulate objects, participate in experiments, and engage in role-playing exercises.</p>
+        
+        <p><strong>Read/Write Learners:</strong> Learn effectively through reading and writing activities. They prefer to read textbooks, take notes, and write summaries or essays to process information.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="nav-trends">
+    <h2>Software Industry Insights</h2>
+    <div id="trendsContainer">
+      <!-- Charts will be dynamically generated here -->
+    </div>
+  </section>
+
+  <section id="nav-resources">
+    <h2>Resources</h2>
+    <div class="btn-group"></div>
     <div id="resources" class="card-list"></div>
-</section>
-<section>
-    <h2 id="nav-projects">Projects</h2>
-    <button onclick="fetchProjects()">Show Projects</button>
+  </section>
+
+  <section id="nav-projects">
+    <h2>Projects</h2>
+    <button onclick="fetchProjects()" class="btn visual">Show Projects</button>
     <div id="projects" class="card-list"></div>
-</section>
-<section>
-    <h2 id="nav-resume">Resume Analysis</h2>
-    <label for="resumeText"></label><textarea id="resumeText" rows="4" cols="50" placeholder="Paste your resume here"></textarea><br>
-    <button onclick="analyzeResume()">Analyze Resume</button>
-</section>
+  </section>
+
+  <section id="nav-resume">
+    <h2>Resume Analysis</h2>
+    <textarea id="resumeText" placeholder="Paste your resume here..."></textarea>
+    <button onclick="analyzeResume()" class="btn kinesthetic">Analyze Resume</button>
+    <pre id="resumeResult"></pre>
+  </section>
+
+  <!-- Scroll to Top Button -->
+  <button id="scrollToTop" class="scroll-to-top" title="Back to top">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+    </svg>
+  </button>
 </body>
 </html>
