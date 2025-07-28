@@ -52,7 +52,7 @@ Go to [Render](https://techmap-sy4z.onrender.com/)
 
    ```bash
    git clone https://github.com/hd77alu/techmap.git
-   cd techmap/backend
+   cd techmap/Backend
    ```
 
 2. **Install backend dependencies**
