@@ -4,6 +4,11 @@ Techmap is a responsive web application designed to empower Software Engineering
 
 ---
 
+## Usage
+Go to [Render](https://techmap-sy4z.onrender.com/)
+& Watch This [Demo Video](https://screenrec.com/share/XZctJCGTUW)
+
+---
 ## 🚀 Key Features
 
 * **Google OAuth 2.0 Authentication**
@@ -68,22 +73,31 @@ Techmap is a responsive web application designed to empower Software Engineering
    npm run seed       # Seed CSV data
    ```
 
-4. **Configure environment variables**
-   Create a `.env` file in `backend/` with:
+4. Google OAuth Setup
 
+A. **Create OAuth Credentials:**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Navigate to APIs & Services → Credentials
+   - Create OAuth 2.0 Client ID for web application
+
+B. **Configure Redirect URIs:**
+   - **URI:** `http://localhost:3000/auth/google/callback`
+
+5.  **Configure environment variables**
+ Create a `.env` file in `backend/` with:
    ```env
    GOOGLE_CLIENT_ID=your_google_client_id
    GOOGLE_CLIENT_SECRET=your_google_client_secret
    SESSION_SECRET=your_session_secret
    ```
-
-5. **Start the server**
+   
+7.  **Start the server**
 
    ```bash
    npm start
    ```
 
-6. **Serve the frontend**
+8. **Serve the frontend**
    Open your browser at `http://localhost:3000`.
 
 ---
