@@ -28,9 +28,10 @@ app.use(session({
   resave: false, 
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: false, // Allow cookies over HTTP for now - Render handles HTTPS termination
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'lax' // Add this for better compatibility
   }
 }));
 app.use(passport.initialize());
