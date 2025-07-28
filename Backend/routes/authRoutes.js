@@ -5,11 +5,6 @@ router.get('/google', passport.authenticate('google', { scope: ['profile','email
 router.get('/google/callback', 
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
-        // Debug logging for production
-        console.log('OAuth Success - User:', req.user ? 'Found' : 'Not Found');
-        console.log('Session ID:', req.sessionID);
-        console.log('Is Authenticated:', req.isAuthenticated());
-        
         // Successful authentication, redirect to dashboard
         res.redirect('/dashboard');
     }

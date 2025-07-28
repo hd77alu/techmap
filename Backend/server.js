@@ -16,8 +16,6 @@ app.get('/', (req, res) => {
 
 // Serve dashboard for authenticated users
 app.get('/dashboard', ensureAuth, (req, res) => {
-    console.log('Dashboard access - User:', req.user ? 'Authenticated' : 'Not Authenticated');
-    console.log('Session ID:', req.sessionID);
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
