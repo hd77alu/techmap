@@ -69,7 +69,7 @@ document.getElementById('quizForm').onsubmit = async function(e) {
 
   // Send to backend
   try {
-    const res = await fetch('/api/learning-style', {
+    const res = await fetch('/api/styles', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

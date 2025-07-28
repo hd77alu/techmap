@@ -41,7 +41,7 @@ app.use('/api/resources', require('./routes/resourceRoutes'));
 app.use('/api/trends', require('./routes/trendsRoutes'));
 app.use('/api/resume', require('./routes/resumeRoutes'));
 app.use('/api/projects', require('./routes/projectRoutes'));
-app.use('/api/learning-style', require('./routes/learningRoutes'));
+app.use('/api/styles', require('./routes/learningRoutes'));
 app.use('/api/user', require('./routes/userRoutes'));
 
 module.exports = app;

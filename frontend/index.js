@@ -113,7 +113,7 @@ fetchProfile();
 
 // Fetch and display user's learning style assessment in descending order
 function fetchLearningStyleAssessment() {
-    apiFetch('/api/learning-style')
+    apiFetch('/api/styles')
         .then(data => {
             let styleScores;
             if (data && (data.visual || data.auditory || data.kinesthetic || data.reading)) {
